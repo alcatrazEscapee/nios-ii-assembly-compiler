@@ -1,6 +1,7 @@
 package compiler.keyword;
 
 import compiler.component.ComponentMain;
+import compiler.component.IComponent;
 import compiler.component.IComponentManager;
 import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
@@ -23,6 +24,6 @@ public class KeywordMain implements IKeyword
         }
 
         inputBuilder.deleteCharAt(0);
-        compiler.addComponent("current", new ComponentMain());
+        compiler.addComponent(IComponent.Type.CURRENT, new ComponentMain());
     }
 }

@@ -1,12 +1,11 @@
-package compiler.keyword.regex;
+package compiler.util;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import compiler.component.IComponent;
-import compiler.util.InvalidAssemblyException;
 
-public class RegisterExpressions
+public final class RegisterExpressions
 {
     private static final Map<String, String> EXPRESSIONS = new HashMap<>();
     private static final Map<String, String> COMPARISONS = new HashMap<>();

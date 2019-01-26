@@ -2,28 +2,22 @@ package compiler.component;
 
 public class ComponentMain extends AbstractComponent
 {
-    private static final String HEADER = "# Entry point\n" +
-            "_start:\n" +
-            IComponent.format("movia", "sp, LAST_RAM_WORD\n");
-    private static final String FOOTER = "_end:\n" +
-            IComponent.format("br", "_end\n");
-
     @Override
-    public String getType()
+    public Type getType()
     {
-        return "main";
+        return Type.MAIN;
     }
 
     @Override
     public String compile()
     {
         StringBuilder output = new StringBuilder();
-        output.append(HEADER);
+        output.append("# Entry point\n").append("_start:\n").append(IComponent.format("movia", "sp, LAST_RAM_WORD\n"));
         for (IComponent cmp : components)
         {
             output.append(cmp.compile());
         }
-        output.append(FOOTER);
+        output.append("_end:\n").append(IComponent.format("br", "_end\n"));
         return output.toString();
     }
 }

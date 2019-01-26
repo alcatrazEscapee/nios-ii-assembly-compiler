@@ -1,6 +1,7 @@
 package compiler.keyword;
 
 import compiler.component.ComponentFunction;
+import compiler.component.IComponent;
 import compiler.component.IComponentManager;
 import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
@@ -21,7 +22,7 @@ public class KeywordFunction extends AbstractKeyword
         {
             throw new InvalidAssemblyException("Function name must be non empty");
         }
-        compiler.addComponent("current", new ComponentFunction(source.toString(), keyword.startsWith("void")));
+        compiler.addComponent(IComponent.Type.CURRENT, new ComponentFunction(source.toString(), keyword.startsWith("void")));
 
     }
 }

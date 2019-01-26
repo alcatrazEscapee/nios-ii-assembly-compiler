@@ -15,7 +15,7 @@ public class KeywordComment implements IKeyword
     @Override
     public void apply(String keyword, StringBuilder inputBuilder, IComponentManager compiler)
     {
-        IComponent parent = compiler.getComponent("current");
+        IComponent parent = compiler.getComponent(IComponent.Type.CURRENT);
         if (parent != null)
         {
             parent.add(new ComponentStatic("\t#" + inputBuilder + "\n"));

@@ -5,9 +5,10 @@ import java.util.Stack;
 import compiler.component.ComponentStatic;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
-import compiler.keyword.regex.RegisterExpressions;
+import compiler.component.INamedComponent;
 import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
+import compiler.util.RegisterExpressions;
 
 public class KeywordIf extends AbstractKeyword
 {
@@ -23,8 +24,8 @@ public class KeywordIf extends AbstractKeyword
     public void apply(String keyword, StringBuilder inputBuilder, IComponentManager compiler)
     {
         StringBuilder source = Helpers.nextLine(inputBuilder, ':', false);
-        IComponent parent = compiler.getComponent("current");
-        Stack<IComponent> controlStack = compiler.getControlStack();
+        IComponent parent = compiler.getComponent(IComponent.Type.CURRENT);
+        Stack<INamedComponent> controlStack = compiler.getControlStack();
 
         String lhs = getArg(source, COMPARATORS);
         if (!REGISTERS.contains(lhs))

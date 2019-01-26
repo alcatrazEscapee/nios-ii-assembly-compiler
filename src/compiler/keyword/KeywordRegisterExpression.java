@@ -4,9 +4,9 @@ import compiler.Compiler;
 import compiler.component.ComponentStatic;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
-import compiler.keyword.regex.RegisterExpressions;
 import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
+import compiler.util.RegisterExpressions;
 
 public class KeywordRegisterExpression extends AbstractKeyword
 {
@@ -26,7 +26,7 @@ public class KeywordRegisterExpression extends AbstractKeyword
     @Override
     public void apply(String keyword, StringBuilder inputBuilder, IComponentManager compiler)
     {
-        IComponent parent = compiler.getComponent("current");
+        IComponent parent = compiler.getComponent(IComponent.Type.CURRENT);
         StringBuilder source = Helpers.nextLine(inputBuilder);
         boolean byteFlag = false, ioFlag = false;
 

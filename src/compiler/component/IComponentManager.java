@@ -9,9 +9,9 @@ public interface IComponentManager
         addComponent(component.getType(), component);
     }
 
-    void addComponent(String name, IComponent component);
+    void addComponent(IComponent.Type type, IComponent component);
 
-    IComponent getComponent(String name);
+    IComponent getComponent(IComponent.Type type);
 
-    Stack<IComponent> getControlStack();
+    Stack<INamedComponent> getControlStack();
 }

@@ -11,17 +11,17 @@ public class KeywordVariableStore extends AbstractKeyword
     @Override
     public boolean matches(String keyword, StringBuilder inputBuilder)
     {
-        return keyword.endsWith("=") || keyword.equals("&");
+        return keyword.endsWith("=") || keyword.equals("*");
     }
 
     @Override
     public void apply(String keyword, StringBuilder inputBuilder, IComponentManager compiler)
     {
         StringBuilder source = Helpers.nextLine(inputBuilder);
-        IComponent parent = compiler.getComponent("current");
+        IComponent parent = compiler.getComponent(IComponent.Type.CURRENT);
         boolean byteFlag = false, ioFlag = false;
 
-        if (keyword.equals("&"))
+        if (keyword.equals("*"))
         {
             String lhs = getArg(source, "=", "[");
             if (!REGISTERS.contains(lhs))

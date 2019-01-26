@@ -5,6 +5,7 @@ import java.util.*;
 import compiler.component.ComponentVariable;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
+import compiler.component.INamedComponent;
 import compiler.keyword.*;
 import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
@@ -20,7 +21,7 @@ public enum Compiler implements IComponentManager
     private static final Set<IKeyword> KEYWORDS = new HashSet<>(Arrays.asList(new KeywordCompile(), new KeywordMain(), new KeywordIf(), new KeywordElse(), new KeywordWhile(), new KeywordEnd(), new KeywordRegisterExpression(), new KeywordVariable(), new KeywordCall(), new KeywordFunction(), new KeywordVariableStore(), new KeywordComment()));
 
     private Map<String, String> declaredConstants;
-    private Stack<IComponent> controlStack;
+    private Stack<INamedComponent> controlStack;
     private List<IComponent> componentsAlignedVars;
     private List<IComponent> componentsDefaultVars;
     private List<IComponent> componentsFunctions;
@@ -118,20 +119,20 @@ public enum Compiler implements IComponentManager
     }
 
     @Override
-    public void addComponent(String name, IComponent component)
+    public void addComponent(IComponent.Type type, IComponent component)
     {
-        switch (name)
+        switch (type)
         {
-            case "compile":
+            case COMPILE:
                 if (componentCompile != null)
                     throw new InvalidAssemblyException("Multiple compile statements not allowed");
                 componentCompile = component;
                 break;
-            case "main":
+            case MAIN:
                 if (componentMain != null) throw new InvalidAssemblyException("Multiple main statements not allowed");
                 componentMain = component;
                 break;
-            case "variable":
+            case VARIABLE:
                 if (((ComponentVariable) component).isWordAligned())
                 {
                     componentsAlignedVars.add(component);
@@ -141,36 +142,36 @@ public enum Compiler implements IComponentManager
                     componentsDefaultVars.add(component);
                 }
                 break;
-            case "function":
+            case FUNCTION:
                 componentsFunctions.add(component);
                 break;
-            case "current":
+            case CURRENT:
                 this.componentCurrent = component;
                 break;
             default:
-                throw new InvalidAssemblyException("Unknown component type " + component.getType());
+                throw new InvalidAssemblyException("Unknown component type " + type);
 
         }
     }
 
     @Override
-    public IComponent getComponent(String name)
+    public IComponent getComponent(IComponent.Type type)
     {
-        switch (name)
+        switch (type)
         {
-            case "compile":
+            case COMPILE:
                 return componentCompile;
-            case "main":
+            case MAIN:
                 return componentMain;
-            case "current":
+            case CURRENT:
                 return componentCurrent;
             default:
-                throw new InvalidAssemblyException("Unknown component type to access " + name);
+                throw new InvalidAssemblyException("Unknown component type to access " + type);
         }
     }
 
     @Override
-    public Stack<IComponent> getControlStack()
+    public Stack<INamedComponent> getControlStack()
     {
         return controlStack;
     }

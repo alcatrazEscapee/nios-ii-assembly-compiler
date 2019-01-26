@@ -5,6 +5,7 @@ import java.util.Stack;
 import compiler.component.ComponentStatic;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
+import compiler.component.INamedComponent;
 import compiler.util.InvalidAssemblyException;
 
 public class KeywordElse extends AbstractKeyword
@@ -24,18 +25,18 @@ public class KeywordElse extends AbstractKeyword
             inputBuilder.deleteCharAt(0);
         }
 
-        IComponent parent = compiler.getComponent("current");
-        Stack<IComponent> controlStack = compiler.getControlStack();
+        IComponent parent = compiler.getComponent(IComponent.Type.CURRENT);
+        Stack<INamedComponent> controlStack = compiler.getControlStack();
         if (parent == null)
         {
             throw new InvalidAssemblyException("Unexpected 'else' outside of a function " + inputBuilder);
         }
-        if (controlStack.isEmpty() || !controlStack.peek().getType().startsWith("_if"))
+        if (controlStack.isEmpty() || !controlStack.peek().getLabel().startsWith("_if"))
         {
             throw new InvalidAssemblyException("Unknown element on control stack, expected '_if'");
         }
-        IComponent componentIf = controlStack.pop();
-        String labelIf = componentIf.getType();
+        INamedComponent componentIf = controlStack.pop();
+        String labelIf = componentIf.getLabel();
         String labelElse = "_else" + labelIf.substring(3);
 
         controlStack.add(new ComponentStatic(labelElse + ":\n", "", labelElse));

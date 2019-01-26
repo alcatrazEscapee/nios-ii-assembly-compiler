@@ -4,6 +4,7 @@ import java.util.Stack;
 
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
+import compiler.component.INamedComponent;
 import compiler.util.InvalidAssemblyException;
 
 public class KeywordEnd implements IKeyword
@@ -17,13 +18,13 @@ public class KeywordEnd implements IKeyword
     @Override
     public void apply(String keyword, StringBuilder inputBuilder, IComponentManager compiler)
     {
-        IComponent parent = compiler.getComponent("current");
+        IComponent parent = compiler.getComponent(IComponent.Type.CURRENT);
         if (parent == null)
         {
             throw new InvalidAssemblyException("Unexpected 'end' when parsing " + inputBuilder);
         }
 
-        Stack<IComponent> controlStack = compiler.getControlStack();
+        Stack<INamedComponent> controlStack = compiler.getControlStack();
         if (!controlStack.isEmpty())
         {
             parent.add(controlStack.pop());
@@ -31,7 +32,7 @@ public class KeywordEnd implements IKeyword
         else
         {
             compiler.addComponent(parent);
-            compiler.addComponent("current", null);
+            compiler.addComponent(IComponent.Type.CURRENT, null);
         }
     }
 }

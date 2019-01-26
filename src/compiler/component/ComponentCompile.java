@@ -1,13 +1,11 @@
 package compiler.component;
 
-import compiler.Compiler;
-
 public class ComponentCompile extends AbstractComponent
 {
     @Override
-    public String getType()
+    public Type getType()
     {
-        return "compile";
+        return Type.COMPILE;
     }
 
     @Override
@@ -26,14 +24,5 @@ public class ComponentCompile extends AbstractComponent
         output.append(IComponent.format(".org", "0x00000000\n"));
         output.append("\t.text\n\n");
         return output.toString();
-    }
-
-    @Override
-    public void add(IComponent sub)
-    {
-        // Unpack the define statement into name + value:
-        String[] parts = sub.getType().split("@");
-        Compiler.INSTANCE.registerConstant(parts[0], parts[1]);
-        super.add(sub);
     }
 }

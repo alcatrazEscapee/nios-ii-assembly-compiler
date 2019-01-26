@@ -16,9 +16,9 @@ public class ComponentFunction extends AbstractComponent
     }
 
     @Override
-    public String getType()
+    public Type getType()
     {
-        return "function";
+        return Type.FUNCTION;
     }
 
     @Override

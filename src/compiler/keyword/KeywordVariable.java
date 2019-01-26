@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import compiler.Compiler;
 import compiler.component.ComponentStatic;
 import compiler.component.ComponentVariable;
 import compiler.component.IComponent;
@@ -127,9 +128,11 @@ public class KeywordVariable extends AbstractKeyword
             // Remove '='
             source.deleteCharAt(0);
 
-            IComponent cmp = compiler.getComponent("compile");
+            IComponent cmp = compiler.getComponent(IComponent.Type.COMPILE);
             String result = IComponent.format(".equ", String.format("%s, %s\n", varName, source));
-            cmp.add(new ComponentStatic(result, "", varName + "@" + source));
+
+            Compiler.INSTANCE.registerConstant(varName, source.toString());
+            cmp.add(new ComponentStatic(result));
         }
     }
 }

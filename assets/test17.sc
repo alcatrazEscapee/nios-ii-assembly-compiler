@@ -36,7 +36,7 @@ void function PrintChar:
         r4 = (io) &r3[STATUS_OFFSET];
         r4 ?&= WSPACE_MASK;
     end
-    &r3[DATA_OFFSET] = (io) r2;
+    *r3[DATA_OFFSET] = (io) r2;
 end
 
 void function PrintHexDigit:

@@ -17,9 +17,9 @@ public class ComponentVariable implements IComponent
     }
 
     @Override
-    public String getType()
+    public Type getType()
     {
-        return "variable";
+        return Type.VARIABLE;
     }
 
     @Override

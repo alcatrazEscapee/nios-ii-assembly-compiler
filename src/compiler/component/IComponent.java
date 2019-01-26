@@ -9,7 +9,7 @@ public interface IComponent
         return String.format(Compiler.FORMAT_STRING_FIELDS, p1, p2);
     }
 
-    String getType();
+    Type getType();
 
     String compile();
 
@@ -30,5 +30,15 @@ public interface IComponent
     default String getWriteRegister()
     {
         return "";
+    }
+
+    enum Type
+    {
+        COMPILE,
+        MAIN,
+        VARIABLE,
+        FUNCTION,
+        CURRENT,
+        SUB
     }
 }

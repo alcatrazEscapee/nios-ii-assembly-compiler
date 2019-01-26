@@ -19,8 +19,10 @@ _end:
 AddValues:
     subi            sp, sp, 4
     stw             r16, 0(sp)
+
     add             r16, r2, r3
     mov             r2, r16
+
     ldw             r16, 0(sp)
     addi            sp, sp, 4
     ret

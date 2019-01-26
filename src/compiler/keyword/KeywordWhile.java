@@ -29,6 +29,14 @@ public class KeywordWhile extends AbstractKeyword
         String lhs = getArg(source, COMPARATORS);
         if (!REGISTERS.contains(lhs))
         {
+            if (lhs.equals("true"))
+            {
+                String label = "_while" + (++counter);
+                String result = IComponent.format("br", label) + "\n";
+                parent.add(new ComponentStatic(label + ":\n", "", label));
+                controlStack.add(new ComponentStatic(result));
+                return;
+            }
             throw new InvalidAssemblyException("Unable to do an while statement with LHS not a register: " + lhs + source);
         }
 

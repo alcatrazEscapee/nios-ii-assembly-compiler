@@ -18,8 +18,13 @@ public class RegisterExpressions
         EXPRESSIONS.put("-", "sub");
         EXPRESSIONS.put("*", "mul");
         EXPRESSIONS.put("/", "div");
+        EXPRESSIONS.put("?/", "divu"); // Unsigned Division
         EXPRESSIONS.put("|", "or");
         EXPRESSIONS.put("&", "and");
+        EXPRESSIONS.put("^", "xor");
+        EXPRESSIONS.put("?&", "andh"); // High half-word operators
+        EXPRESSIONS.put("?|", "orh");
+        EXPRESSIONS.put("?^", "xorh");
 
         COMPARISONS.put("<=", "ble");
         COMPARISONS.put(">=", "bge");
@@ -42,6 +47,10 @@ public class RegisterExpressions
         {
             throw new InvalidAssemblyException("Unknown operation " + op);
         }
+        if (op.startsWith("?") && !op.equals("?/"))
+        {
+            throw new InvalidAssemblyException("'hi' operators can only be used with immediate values");
+        }
         return IComponent.format(EXPRESSIONS.get(op), String.format("%s, %s, %s\n", rX, rY, rZ));
     }
 
@@ -49,7 +58,7 @@ public class RegisterExpressions
     {
         if (op.equals("/"))
         {
-            throw new InvalidAssemblyException("Division cannot be done with immeadiate values");
+            throw new InvalidAssemblyException("Division cannot be done with immediate values");
         }
         return IComponent.format(EXPRESSIONS.get(op) + "i", String.format("%s, %s, %s\n", rX, rY, imm));
     }

@@ -10,7 +10,7 @@ public class KeywordFunction extends AbstractKeyword
     @Override
     public boolean matches(String keyword, StringBuilder inputBuilder)
     {
-        return IKeyword.matchKeyword(keyword, inputBuilder, "function");
+        return IKeyword.matchKeyword(keyword, inputBuilder, "function") || IKeyword.matchKeyword(keyword, inputBuilder, "void function");
     }
 
     @Override
@@ -21,7 +21,7 @@ public class KeywordFunction extends AbstractKeyword
         {
             throw new InvalidAssemblyException("Function name must be non empty");
         }
-        compiler.addComponent("current", new ComponentFunction(source.toString()));
+        compiler.addComponent("current", new ComponentFunction(source.toString(), keyword.startsWith("void")));
 
     }
 }

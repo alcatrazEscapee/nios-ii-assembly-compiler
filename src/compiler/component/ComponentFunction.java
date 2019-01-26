@@ -7,10 +7,12 @@ import java.util.List;
 public class ComponentFunction extends AbstractComponent
 {
     private final String functionName;
+    private final boolean noReturnValue;
 
-    public ComponentFunction(String functionName)
+    public ComponentFunction(String functionName, boolean noReturnValue)
     {
         this.functionName = functionName;
+        this.noReturnValue = noReturnValue;
     }
 
     @Override
@@ -31,9 +33,12 @@ public class ComponentFunction extends AbstractComponent
         for (IComponent cmp : components)
         {
             String write = cmp.getWriteRegister();
-            if (!write.equals("") && !write.equals("r2"))
+            if (!write.equals("") && (!write.equals("r2") || noReturnValue))
             {
-                registerWrites.add(write);
+                if (!registerWrites.contains(write))
+                {
+                    registerWrites.add(write);
+                }
             }
         }
         Collections.sort(registerWrites);
@@ -49,6 +54,7 @@ public class ComponentFunction extends AbstractComponent
                 size -= 4;
                 output.append(IComponent.format("stw", write + ", " + size + "(sp)\n"));
             }
+            output.append("\n");
         }
 
         // Add the body of the function
@@ -60,6 +66,7 @@ public class ComponentFunction extends AbstractComponent
         // Add the addi / ldw commands at the header
         if (!registerWrites.isEmpty())
         {
+            output.append("\n");
             int size = maxSize;
             for (String write : registerWrites)
             {

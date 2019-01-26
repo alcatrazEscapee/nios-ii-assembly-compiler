@@ -1,3 +1,4 @@
+// ELEC 274 Lab 1
 compile nios-ii de0
 
 int A = 3;

@@ -28,6 +28,7 @@ public class KeywordRegisterExpression extends AbstractKeyword
     {
         IComponent parent = compiler.getComponent("current");
         StringBuilder source = Helpers.nextLine(inputBuilder);
+        boolean byteFlag = false, ioFlag = false;
 
         if (parent == null)
         {
@@ -68,12 +69,54 @@ public class KeywordRegisterExpression extends AbstractKeyword
             }
             else
             {
-                // Case: rX = variable / rX = immediate / rX = &variable
+                // Casting flags
+                if (lhs.length() >= 4 && lhs.startsWith("(io)"))
+                {
+                    ioFlag = true;
+                    lhs = lhs.substring(4);
+                }
+                if (lhs.length() >= 6 && lhs.startsWith("(byte)"))
+                {
+                    byteFlag = true;
+                    lhs = lhs.substring(6);
+                }
+                if (lhs.length() >= 8 && lhs.startsWith("(byteio)"))
+                {
+                    byteFlag = ioFlag = true;
+                    lhs = lhs.substring(8);
+                }
+
+
+                // Case: rX = variable / rX = immediate / rX = &variable / rX = &rY
                 if (lhs.length() == 0 && source.charAt(0) == '&')
                 {
-                    // Case: rX = &variable
-                    String result = IComponent.format("movia", keyword + ", " + source.substring(1) + "\n");
-                    parent.add(new ComponentStatic(result, keyword));
+                    // Remove the '&'
+                    source.deleteCharAt(0);
+                    String rhs = getArg(source, ALL);
+                    if (REGISTERS.contains(rhs))
+                    {
+                        // Case rX = &rY / rX = &rY[offset]
+                        String offset = "0";
+
+                        if (source.length() > 0 && source.charAt(0) == '[')
+                        {
+                            // Remove leading '['
+                            source.deleteCharAt(0);
+                            offset = getArg(source, "]");
+                            // Remove ending ']'
+                            source.deleteCharAt(0);
+                        }
+
+                        String cmd = makeLoad(byteFlag, ioFlag);
+                        String result = IComponent.format(cmd, String.format("%s, %s(%s)\n", keyword, offset, rhs));
+                        parent.add(new ComponentStatic(result, keyword));
+                    }
+                    else
+                    {
+                        // Case: rX = &variable
+                        String result = IComponent.format("movia", keyword + ", " + rhs + "\n");
+                        parent.add(new ComponentStatic(result, keyword));
+                    }
                 }
                 else
                 {
@@ -86,8 +129,11 @@ public class KeywordRegisterExpression extends AbstractKeyword
                         {
                             var = lhs;
                         }
-
-                        int x = Integer.parseInt(var);
+                        // Account for characters (i.e. 'G'), which are immeadiates, but don't pass Integer#parseInt
+                        if (!(var.length() == 3 && var.startsWith("'") && var.endsWith("'")))
+                        {
+                            Integer.parseInt(var);
+                        }
                         // Case rX = immediate
                         String result = IComponent.format("movi", keyword + ", " + lhs + "\n");
                         parent.add(new ComponentStatic(result, keyword));
@@ -99,8 +145,13 @@ public class KeywordRegisterExpression extends AbstractKeyword
                         if (source.length() == 0)
                         {
                             // Case: rX = variable
-                            String result = IComponent.format("ldw", keyword + ", " + lhs + "(r0)\n");
+                            String cmd = makeLoad(byteFlag, ioFlag);
+                            String result = IComponent.format(cmd, keyword + ", " + lhs + "(r0)\n");
                             parent.add(new ComponentStatic(result, keyword));
+                        }
+                        else
+                        {
+                            // Case: rX = (cast?) &r3
                         }
                     }
                 }
@@ -112,22 +163,31 @@ public class KeywordRegisterExpression extends AbstractKeyword
             String op = getOp(source);
             if (source.charAt(0) != '=')
             {
-                throw new InvalidAssemblyException("Unknown operator with assignment " + op + source);
-            }
-            source.deleteCharAt(0);
-            String rhs = getArg(source, ALL);
-            if (REGISTERS.contains(rhs))
-            {
-                // Case: rX OP= rY
-                String result = RegisterExpressions.of(keyword, keyword, op, rhs);
-                parent.add(new ComponentStatic(result, keyword));
+                throw new InvalidAssemblyException("Unknown operator with assignment " + op + " " + source);
             }
             else
             {
-                // Case: rX OP= immediate
-                String result = RegisterExpressions.ofImm(keyword, keyword, op, rhs);
-                parent.add(new ComponentStatic(result, keyword));
+                // Cases: rX OP= imm / rX OP= rY
+                source.deleteCharAt(0);
+                String rhs = getArg(source, ALL);
+                if (REGISTERS.contains(rhs))
+                {
+                    // Case: rX OP= rY
+                    String result = RegisterExpressions.of(keyword, keyword, op, rhs);
+                    parent.add(new ComponentStatic(result, keyword));
+                }
+                else
+                {
+                    // Case: rX OP= immediate
+                    String result = RegisterExpressions.ofImm(keyword, keyword, op, rhs);
+                    parent.add(new ComponentStatic(result, keyword));
+                }
             }
         }
+    }
+
+    private String makeLoad(boolean byteFlag, boolean ioFlag)
+    {
+        return "ld" + (byteFlag ? "b" : "w") + (ioFlag ? "io" : "");
     }
 }

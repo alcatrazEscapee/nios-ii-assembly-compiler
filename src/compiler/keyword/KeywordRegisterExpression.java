@@ -1,5 +1,6 @@
 package compiler.keyword;
 
+import compiler.Compiler;
 import compiler.component.ComponentStatic;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
@@ -33,7 +34,7 @@ public class KeywordRegisterExpression extends AbstractKeyword
             throw new InvalidAssemblyException("Register expression found outside function");
         }
 
-        System.out.println("Matching a line + " + source);
+        System.out.println("Matching a line " + source);
         if (source.charAt(0) == '=')
         {
             source.deleteCharAt(0);
@@ -67,24 +68,40 @@ public class KeywordRegisterExpression extends AbstractKeyword
             }
             else
             {
-                // Case: rX = variable / rX = variable[offset register] / rX = immediate
-                try
+                // Case: rX = variable / rX = immediate / rX = &variable
+                if (lhs.length() == 0 && source.charAt(0) == '&')
                 {
-                    System.out.println("Trying to parse " + lhs);
-                    int x = Integer.parseInt(lhs);
-                    // Case rX = immediate
-                    String result = IComponent.format("movi", keyword + ", " + lhs + "\n");
+                    // Case: rX = &variable
+                    String result = IComponent.format("movia", keyword + ", " + source.substring(1) + "\n");
                     parent.add(new ComponentStatic(result, keyword));
                 }
-                catch (NumberFormatException e)
+                else
                 {
-                    System.out.println("Caught, " + e);
-                    // It wasn't an immediate
-                    if (source.length() == 0)
+                    try
                     {
-                        // Case: rX = variable
-                        String result = IComponent.format("ldw", keyword + ", " + lhs + "(r0)\n");
+                        System.out.println("Trying to parse " + lhs);
+                        // Account for constants
+                        String var = Compiler.INSTANCE.getConstant(lhs);
+                        if (var.equals(""))
+                        {
+                            var = lhs;
+                        }
+
+                        int x = Integer.parseInt(var);
+                        // Case rX = immediate
+                        String result = IComponent.format("movi", keyword + ", " + lhs + "\n");
                         parent.add(new ComponentStatic(result, keyword));
+                    }
+                    catch (NumberFormatException e)
+                    {
+                        System.out.println("Caught, " + e);
+                        // It wasn't an immediate
+                        if (source.length() == 0)
+                        {
+                            // Case: rX = variable
+                            String result = IComponent.format("ldw", keyword + ", " + lhs + "(r0)\n");
+                            parent.add(new ComponentStatic(result, keyword));
+                        }
                     }
                 }
             }

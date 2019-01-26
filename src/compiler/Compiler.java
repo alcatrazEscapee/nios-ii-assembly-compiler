@@ -86,7 +86,6 @@ public enum Compiler implements IComponentManager
 
         if (!componentsFunctions.isEmpty())
         {
-            // todo: add a functions header
             for (IComponent cmp : componentsFunctions)
             {
                 outputBuilder.append(cmp.compile());

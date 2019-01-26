@@ -23,7 +23,7 @@ public class KeywordIf extends AbstractKeyword
     public void apply(String keyword, StringBuilder inputBuilder, IComponentManager compiler)
     {
         StringBuilder source = Helpers.nextLine(inputBuilder, ':', false);
-        IComponent parent = compiler.getCurrent();
+        IComponent parent = compiler.getComponent("current");
         Stack<IComponent> controlStack = compiler.getControlStack();
 
         String lhs = getArg(source, COMPARATORS);

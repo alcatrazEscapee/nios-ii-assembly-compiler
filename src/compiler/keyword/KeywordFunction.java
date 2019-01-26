@@ -21,7 +21,7 @@ public class KeywordFunction extends AbstractKeyword
         {
             throw new InvalidAssemblyException("Function name must be non empty");
         }
-        compiler.setCurrent(new ComponentFunction(source.toString()));
+        compiler.addComponent("current", new ComponentFunction(source.toString()));
 
     }
 }

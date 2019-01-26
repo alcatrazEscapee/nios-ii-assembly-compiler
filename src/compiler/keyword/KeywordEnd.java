@@ -17,7 +17,7 @@ public class KeywordEnd implements IKeyword
     @Override
     public void apply(String keyword, StringBuilder inputBuilder, IComponentManager compiler)
     {
-        IComponent parent = compiler.getCurrent();
+        IComponent parent = compiler.getComponent("current");
         if (parent == null)
         {
             throw new InvalidAssemblyException("Unexpected 'end' when parsing " + inputBuilder);
@@ -31,7 +31,7 @@ public class KeywordEnd implements IKeyword
         else
         {
             compiler.addComponent(parent);
-            compiler.setCurrent(null);
+            compiler.addComponent("current", null);
         }
     }
 }

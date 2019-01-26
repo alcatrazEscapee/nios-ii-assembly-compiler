@@ -89,6 +89,12 @@ class CompilerTest
     }
 
     @Test
+    void test14()
+    {
+        testMatch("test14");
+    }
+
+    @Test
     void testException1()
     {
         assertThrows(InvalidAssemblyException.class, () -> testException("exc1"));

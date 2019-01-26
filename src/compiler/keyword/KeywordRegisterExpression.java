@@ -25,7 +25,7 @@ public class KeywordRegisterExpression extends AbstractKeyword
     @Override
     public void apply(String keyword, StringBuilder inputBuilder, IComponentManager compiler)
     {
-        IComponent parent = compiler.getCurrent();
+        IComponent parent = compiler.getComponent("current");
         StringBuilder source = Helpers.nextLine(inputBuilder);
 
         if (parent == null)

@@ -23,6 +23,6 @@ public class KeywordMain implements IKeyword
         }
 
         inputBuilder.deleteCharAt(0);
-        compiler.setCurrent(new ComponentMain());
+        compiler.addComponent("current", new ComponentMain());
     }
 }

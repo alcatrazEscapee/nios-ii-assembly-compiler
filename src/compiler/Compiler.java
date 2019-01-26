@@ -116,9 +116,9 @@ public enum Compiler implements IComponentManager
     }
 
     @Override
-    public void addComponent(IComponent component)
+    public void addComponent(String name, IComponent component)
     {
-        switch (component.getType())
+        switch (name)
         {
             case "compile":
                 if (componentCompile != null)
@@ -142,6 +142,9 @@ public enum Compiler implements IComponentManager
             case "function":
                 componentsFunctions.add(component);
                 break;
+            case "current":
+                this.componentCurrent = component;
+                break;
             default:
                 throw new InvalidAssemblyException("Unknown component type " + component.getType());
 
@@ -149,15 +152,19 @@ public enum Compiler implements IComponentManager
     }
 
     @Override
-    public IComponent getCurrent()
+    public IComponent getComponent(String name)
     {
-        return componentCurrent;
-    }
-
-    @Override
-    public void setCurrent(IComponent component)
-    {
-        this.componentCurrent = component;
+        switch (name)
+        {
+            case "compile":
+                return componentCompile;
+            case "main":
+                return componentMain;
+            case "current":
+                return componentCurrent;
+            default:
+                throw new InvalidAssemblyException("Unknown component type to access " + name);
+        }
     }
 
     @Override

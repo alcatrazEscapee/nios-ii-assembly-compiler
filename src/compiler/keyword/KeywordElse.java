@@ -24,7 +24,7 @@ public class KeywordElse extends AbstractKeyword
             inputBuilder.deleteCharAt(0);
         }
 
-        IComponent parent = compiler.getCurrent();
+        IComponent parent = compiler.getComponent("current");
         Stack<IComponent> controlStack = compiler.getControlStack();
         if (parent == null)
         {

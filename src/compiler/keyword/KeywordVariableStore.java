@@ -22,7 +22,7 @@ public class KeywordVariableStore extends AbstractKeyword
 
         // variable = rX
         // todo: more handling for indexes, offsets, etc.
-        IComponent parent = compiler.getCurrent();
+        IComponent parent = compiler.getComponent("current");
         parent.add(new ComponentStatic(IComponent.format("stw", source + ", " + varName + "(r0)\n")));
     }
 }

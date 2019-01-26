@@ -71,9 +71,39 @@ class CompilerTest
     }
 
     @Test
+    void test11()
+    {
+        testMatch("test11");
+    }
+
+    @Test
+    void test12()
+    {
+        testMatch("test12");
+    }
+
+    @Test
+    void test13()
+    {
+        testMatch("test13");
+    }
+
+    @Test
     void testException1()
     {
         assertThrows(InvalidAssemblyException.class, () -> testException("exc1"));
+    }
+
+    @Test
+    void testException2()
+    {
+        assertThrows(InvalidAssemblyException.class, () -> testException("exc2"));
+    }
+
+    @Test
+    void testException3()
+    {
+        assertThrows(InvalidAssemblyException.class, () -> testException("exc3"));
     }
 
     private void testMatch(String fileName)

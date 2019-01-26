@@ -1,5 +1,7 @@
 package compiler.component;
 
+import java.util.Stack;
+
 public interface IComponentManager
 {
     /**
@@ -22,4 +24,11 @@ public interface IComponentManager
      * @param component a component to add
      */
     void setCurrent(IComponent component);
+
+    /**
+     * Gets the stack of control arguments (i.e. if, while and else statements)
+     *
+     * @return the control stack
+     */
+    Stack<IComponent> getControlStack();
 }

@@ -17,7 +17,9 @@ public enum Compiler implements IComponentManager
     public static final String FORMAT_STRING_TABS = "    ";
 
     // These are ordered by priority
-    private static final Set<IKeyword> KEYWORDS = new HashSet<>(Arrays.asList(new KeywordCompile(), new KeywordMain(), new KeywordEnd(), new KeywordRegisterExpression(), new KeywordVariable(), new KeywordCall(), new KeywordFunction(), new KeywordVariableStore(), new KeywordComment()));
+    private static final Set<IKeyword> KEYWORDS = new HashSet<>(Arrays.asList(new KeywordCompile(), new KeywordMain(), new KeywordIf(), new KeywordElse(), new KeywordWhile(), new KeywordEnd(), new KeywordRegisterExpression(), new KeywordVariable(), new KeywordCall(), new KeywordFunction(), new KeywordVariableStore(), new KeywordComment()));
+
+    private Stack<IComponent> controlStack;
     private List<IComponent> componentsAlignedVars;
     private List<IComponent> componentsDefaultVars;
     private List<IComponent> componentsFunctions;
@@ -32,6 +34,9 @@ public enum Compiler implements IComponentManager
         this.componentsDefaultVars = new ArrayList<>();
         this.componentCompile = null;
         this.componentMain = null;
+        this.controlStack = new Stack<>();
+
+        KEYWORDS.forEach(IKeyword::reset);
 
         List<String> inputLines = Helpers.getLinesUnformatted(input);
         input = input.replaceAll("\\s+", " ");
@@ -153,5 +158,11 @@ public enum Compiler implements IComponentManager
     public void setCurrent(IComponent component)
     {
         this.componentCurrent = component;
+    }
+
+    @Override
+    public Stack<IComponent> getControlStack()
+    {
+        return controlStack;
     }
 }

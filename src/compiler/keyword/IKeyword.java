@@ -21,4 +21,6 @@ public interface IKeyword
     boolean matches(String keyword, StringBuilder inputBuilder);
 
     void apply(String keyword, StringBuilder inputBuilder, IComponentManager compiler);
+
+    default void reset() {}
 }

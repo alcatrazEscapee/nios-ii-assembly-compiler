@@ -1,5 +1,8 @@
 package compiler.keyword;
 
+import java.util.Stack;
+
+import compiler.component.IComponent;
 import compiler.component.IComponentManager;
 import compiler.util.InvalidAssemblyException;
 
@@ -14,13 +17,21 @@ public class KeywordEnd implements IKeyword
     @Override
     public void apply(String keyword, StringBuilder inputBuilder, IComponentManager compiler)
     {
-        if (compiler.getCurrent() != null)
+        IComponent parent = compiler.getCurrent();
+        if (parent == null)
         {
-            compiler.addComponent(compiler.getCurrent());
+            throw new InvalidAssemblyException("Unexpected 'end' when parsing " + inputBuilder);
+        }
+
+        Stack<IComponent> controlStack = compiler.getControlStack();
+        if (!controlStack.isEmpty())
+        {
+            parent.add(controlStack.pop());
         }
         else
         {
-            throw new InvalidAssemblyException("Unexpected 'end' when parsing, not in a function.");
+            compiler.addComponent(parent);
+            compiler.setCurrent(null);
         }
     }
 }

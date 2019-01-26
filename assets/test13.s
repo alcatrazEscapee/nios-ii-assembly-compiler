@@ -8,11 +8,10 @@
 # Entry point
 _start:
     movia           sp, LAST_RAM_WORD
-    movi            r2, 1
-    ble             r0, r1, _if1
-    movi            r2, 2
-_if1:
-    movi            r2, 3
+    movi            r5, 1000
+_while1:
+    subi            r5, r5, 1
+    bgt             r5, r0, _while1
 _end:
     br              _end
 

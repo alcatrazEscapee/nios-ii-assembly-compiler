@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import compiler.component.ComponentStatic;
 import compiler.component.ComponentVariable;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
@@ -12,7 +13,7 @@ import compiler.util.InvalidAssemblyException;
 
 public class KeywordVariable extends AbstractKeyword
 {
-    private static final Set<String> VARIABLE_KEYWORDS = new HashSet<>(Arrays.asList("var", "int", "byte", "string"));
+    private static final Set<String> VARIABLE_KEYWORDS = new HashSet<>(Arrays.asList("var", "int", "byte", "string", "const"));
 
     @Override
     public boolean matches(String keyword, StringBuilder inputBuilder)
@@ -114,6 +115,21 @@ public class KeywordVariable extends AbstractKeyword
 
             compiler.addComponent(new ComponentVariable(varName + ":\n" +
                     IComponent.format(".asciz", "\"" + varValue + "\"\n"), false));
+        }
+        else if (keyword.equals("const"))
+        {
+            StringBuilder source = Helpers.nextLine(inputBuilder);
+            String varName = getArg(source, "=");
+            if (source.length() == 0 || source.charAt(0) != '=')
+            {
+                throw new InvalidAssemblyException("Unexpected token at " + varName + source);
+            }
+            // Remove '='
+            source.deleteCharAt(0);
+
+            IComponent cmp = compiler.getComponent("compile");
+            String result = IComponent.format(".equ", String.format("%s, %s\n", varName, source));
+            cmp.add(new ComponentStatic(result, "", varName + "@" + source));
         }
     }
 }

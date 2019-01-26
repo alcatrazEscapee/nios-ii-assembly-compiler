@@ -19,6 +19,7 @@ public enum Compiler implements IComponentManager
     // These are ordered by priority
     private static final Set<IKeyword> KEYWORDS = new HashSet<>(Arrays.asList(new KeywordCompile(), new KeywordMain(), new KeywordIf(), new KeywordElse(), new KeywordWhile(), new KeywordEnd(), new KeywordRegisterExpression(), new KeywordVariable(), new KeywordCall(), new KeywordFunction(), new KeywordVariableStore(), new KeywordComment()));
 
+    private Map<String, String> declaredConstants;
     private Stack<IComponent> controlStack;
     private List<IComponent> componentsAlignedVars;
     private List<IComponent> componentsDefaultVars;
@@ -35,6 +36,7 @@ public enum Compiler implements IComponentManager
         this.componentCompile = null;
         this.componentMain = null;
         this.controlStack = new Stack<>();
+        this.declaredConstants = new HashMap<>();
 
         KEYWORDS.forEach(IKeyword::reset);
 
@@ -171,5 +173,15 @@ public enum Compiler implements IComponentManager
     public Stack<IComponent> getControlStack()
     {
         return controlStack;
+    }
+
+    public void registerConstant(String name, String value)
+    {
+        declaredConstants.put(name, value);
+    }
+
+    public String getConstant(String name)
+    {
+        return declaredConstants.getOrDefault(name, "");
     }
 }

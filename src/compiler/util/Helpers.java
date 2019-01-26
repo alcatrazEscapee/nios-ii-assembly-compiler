@@ -5,10 +5,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public final class Helpers
 {
-
     public static String loadFile(String fileName)
     {
         Path filePath = Paths.get(fileName);
@@ -21,6 +23,17 @@ public final class Helpers
             System.out.println("Error reading file" + e);
             return "";
         }
+    }
+
+    public static List<String> getLinesUnformatted(String input)
+    {
+        // Standardize newlines
+        input = input.replaceAll("\r\n", "\n").replaceAll("\r", "\n").replaceAll("\\n+", "\n");
+        // Standardize spaces
+        input = input.replaceAll("[ \t]+", " ");
+        System.out.println("FORMATTED:\n" + input);
+        // Trim leading and ending spaces
+        return Arrays.stream(input.split("\n")).map(String::trim).collect(Collectors.toList());
     }
 
     public static StringBuilder nextLine(StringBuilder source)

@@ -15,8 +15,9 @@ public enum Compiler implements IComponentManager
 
     public static final String FORMAT_STRING_FIELDS = "\t%-16s%s";
     public static final String FORMAT_STRING_TABS = "    ";
+
     // These are ordered by priority
-    private static final Set<IKeyword> KEYWORDS = new HashSet<>(Arrays.asList(new KeywordCompile(), new KeywordMain(), new KeywordEnd(), new KeywordRegisterExpression(), new KeywordVariable(), new KeywordCall(), new KeywordFunction(), new KeywordVariableStore()));
+    private static final Set<IKeyword> KEYWORDS = new HashSet<>(Arrays.asList(new KeywordCompile(), new KeywordMain(), new KeywordEnd(), new KeywordRegisterExpression(), new KeywordVariable(), new KeywordCall(), new KeywordFunction(), new KeywordVariableStore(), new KeywordComment()));
     private List<IComponent> componentsAlignedVars;
     private List<IComponent> componentsDefaultVars;
     private List<IComponent> componentsFunctions;
@@ -32,30 +33,34 @@ public enum Compiler implements IComponentManager
         this.componentCompile = null;
         this.componentMain = null;
 
+        List<String> inputLines = Helpers.getLinesUnformatted(input);
         input = input.replaceAll("\\s+", " ");
 
-        StringBuilder inputBuilder = new StringBuilder(input);
-        StringBuilder keywordBuilder = new StringBuilder();
-
-        while (inputBuilder.length() > 0)
+        for (String line : inputLines)
         {
-            // Pop a character into the keyword buffer
-            keywordBuilder.append(Helpers.nextChar(inputBuilder));
+            StringBuilder inputBuilder = new StringBuilder(line);
+            StringBuilder keywordBuilder = new StringBuilder();
 
-            String keyword = keywordBuilder.toString();
-            //System.out.printf("Keyword: [%s]\n", keyword);
-
-            for (IKeyword keywordMatcher : KEYWORDS)
+            while (inputBuilder.length() > 0)
             {
-                if (keywordMatcher.matches(keyword, inputBuilder))
+                // Pop a character into the keyword buffer
+                keywordBuilder.append(Helpers.nextChar(inputBuilder));
+
+                String keyword = keywordBuilder.toString();
+                //System.out.printf("Keyword: [%s]\n", keyword);
+
+                for (IKeyword keywordMatcher : KEYWORDS)
                 {
-                    System.out.printf("Match: [%s | %s]\n", keyword, keywordMatcher.getClass().getSimpleName());
+                    if (keywordMatcher.matches(keyword, inputBuilder))
+                    {
+                        System.out.printf("Match: [%s | %s]\n", keyword, keywordMatcher.getClass().getSimpleName());
 
-                    keywordMatcher.apply(keyword, inputBuilder, this);
+                        keywordMatcher.apply(keyword, inputBuilder, this);
 
-                    // Reset keyword and input
-                    keywordBuilder = new StringBuilder();
-                    Helpers.advanceToNextWord(inputBuilder);
+                        // Reset keyword and input
+                        keywordBuilder = new StringBuilder();
+                        Helpers.advanceToNextWord(inputBuilder);
+                    }
                 }
             }
         }

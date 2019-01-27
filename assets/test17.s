@@ -29,11 +29,11 @@ PrintString:
 
     mov             r3, r2
     ldb             r2, 0(r3)
-_while1:
+ps_while1:
     call            PrintChar
     addi            r3, r3, 1
     ldb             r2, 0(r3)
-    bne             r2, r0, _while1
+    bne             r2, r0, ps_while1
 
     ldw             r2, 8(sp)
     ldw             r3, 4(sp)
@@ -48,10 +48,10 @@ PrintChar:
     stw             r4, 0(sp)
 
     movia           r3, JTAG_UART_BASE
-_while2:
+pc_while1:
     ldwio           r4, STATUS_OFFSET(r3)
     andhi           r4, r4, WSPACE_MASK
-    beq             r4, r0, _while2
+    beq             r4, r0, pc_while1
     stwio           r2, DATA_OFFSET(r3)
 
     ldw             r3, 4(sp)
@@ -68,12 +68,12 @@ PrintHexDigit:
 
     # Takes r3 as an argument
     subi            r4, r3, 10
-    bge             r4, r0, _if1
+    bge             r4, r0, phd_if1
     addi            r2, r3, '0'
-    br              _else1
-_if1:
+    br              phd_else1
+phd_if1:
     addi            r2, r3, 'A'
-_else1:
+phd_else1:
     call            PrintChar
 
     ldw             r2, 8(sp)
@@ -93,14 +93,14 @@ PrintHexList:
     # r2 = the list pointer
     # r3 = the size of the list
     mov             r4, r2
-_while3:
+phl_while1:
     ldw             r2, 0(r4)
     call            PrintHexDigit
     movi            r2, ','
     call            PrintChar
     subi            r3, r3, 1
     addi            r4, r4, 4
-    bgt             r3, r0, _while3
+    bgt             r3, r0, phl_while1
 
     ldw             r2, 12(sp)
     ldw             r3, 8(sp)

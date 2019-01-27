@@ -78,13 +78,19 @@ public class KeywordVariable extends AbstractKeyword
 
             if (source.charAt(0) != ']')
             {
-                throw new InvalidAssemblyException("Unexpected token, expecting ']' " + source.toString());
+                throw new InvalidAssemblyException("Unexpected token, expecting ']' " + source);
             }
 
             // Remove close bracket
             source.deleteCharAt(0);
 
-            compiler.addComponent(new ComponentVariable(source + ":\n" +
+            String rhs = getArg(source, ALL);
+            if (source.length() != 0)
+            {
+                throw new InvalidAssemblyException("unexpected token, expecting ';' " + source);
+            }
+
+            compiler.addComponent(new ComponentVariable(rhs + ":\n" +
                     IComponent.format(".skip", varSize + "\n"), false));
         }
         else if (keyword.equals("string"))

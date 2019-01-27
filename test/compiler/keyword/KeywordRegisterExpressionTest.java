@@ -97,9 +97,56 @@ class KeywordRegisterExpressionTest
     }
 
     @Test
+    void apply9()
+    {
+        // rX = rY OP rZ
+        keyword.apply("r5", new StringBuilder(" = r6 + r7;"), stub);
+        assertEquals("    add             r5, r6, r7\n", stub.compile());
+    }
+
+    @Test
+    void apply10()
+    {
+        // rX = rY OP IMM
+        keyword.apply("r5", new StringBuilder(" = sp & 4;"), stub);
+        assertEquals("    andi            r5, sp, 4\n", stub.compile());
+    }
+
+    @Test
+    void apply11()
+    {
+        // rX OP= rY
+        keyword.apply("r5", new StringBuilder(" /= r0;"), stub);
+        assertEquals("    div             r5, r5, r0\n", stub.compile());
+    }
+
+    @Test
+    void apply12()
+    {
+        // rX OP= IMM
+        keyword.apply("r5", new StringBuilder(" ?|= 0xFF;"), stub);
+        assertEquals("    orhi            r5, r5, 0xFF\n", stub.compile());
+    }
+
+    @Test
     void applyException1()
     {
+        // Unknown operator
         assertThrows(InvalidAssemblyException.class, () -> keyword.apply("r1", new StringBuilder(" < r2;"), stub));
+    }
+
+    @Test
+    void applyException2()
+    {
+        // No immediate division
+        assertThrows(InvalidAssemblyException.class, () -> keyword.apply("r1", new StringBuilder(" /= 3;"), stub));
+    }
+
+    @Test
+    void applyException3()
+    {
+        // No register bitwise high operators
+        assertThrows(InvalidAssemblyException.class, () -> keyword.apply("r1", new StringBuilder(" ?&= r2;"), stub));
     }
 
 }

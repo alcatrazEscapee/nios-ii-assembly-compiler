@@ -21,6 +21,7 @@ import compiler.util.RegisterExpressions;
  * rX = rY OP IMM       ->      OPi rX, rY, IMM
  * rX OP= rY            ->      OP rX, rX, rY
  * rX OP= IMM           ->      OPi rX, rX, IMM
+ * rX UOP               ->      OPi rX, rX, 1 (for ++ / --)
  *
  * See {@link RegisterExpressions}
  */
@@ -168,6 +169,12 @@ public class KeywordRegisterExpression extends AbstractKeyword
                     }
                 }
             }
+        }
+        else if (source.toString().equals("++") || source.toString().equals("--"))
+        {
+            // Case: rX UOP
+            String result = RegisterExpressions.ofImm(keyword, keyword, String.valueOf(source.charAt(0)), "1");
+            parent.add(new ComponentStatic(result, keyword));
         }
         else
         {

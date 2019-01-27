@@ -1,18 +1,19 @@
 package compiler.keyword;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
 import compiler.component.ComponentStatic;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
-import compiler.component.INamedComponent;
 import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
 import compiler.util.RegisterExpressions;
 
 public class KeywordWhile extends AbstractKeyword
 {
-    private int counter = 0;
+    private Map<String, Integer> counter = new HashMap<>();
 
     @Override
     public boolean matches(String keyword, StringBuilder inputBuilder)
@@ -25,17 +26,24 @@ public class KeywordWhile extends AbstractKeyword
     {
         StringBuilder source = Helpers.nextLine(inputBuilder, ':', false);
         IComponent parent = compiler.getComponent(IComponent.Type.CURRENT);
-        Stack<INamedComponent> controlStack = compiler.getControlStack();
+        Stack<IComponent> controlStack = compiler.getControlStack();
 
         String lhs = getArg(source, COMPARATORS);
         if (!REGISTERS.contains(lhs))
         {
             if (lhs.equals("true"))
             {
-                String label = "_while" + (++counter);
+                // get the counter for this function
+                String functionName = parent.getFlag();
+                int value = counter.getOrDefault(functionName, 1);
+
+                String label = "_while" + value;
                 String result = IComponent.format("br", label) + "\n";
-                parent.add(new ComponentStatic(label + ":\n", "", label));
+                parent.add(new ComponentStatic(label + ":\n", label));
                 controlStack.add(new ComponentStatic(result));
+
+                // Increment the counter in the map
+                counter.put(functionName, value + 1);
                 return;
             }
             throw new InvalidAssemblyException("Unable to do an while statement with LHS not a register: " + lhs + source);
@@ -54,15 +62,22 @@ public class KeywordWhile extends AbstractKeyword
         }
 
         // This is almost identical to the if statement logic, except the component placement is reversed (label first, break after)
-        String label = "_while" + (++counter);
+        // get the counter for this function
+        String functionName = parent.getFlag();
+        int value = counter.getOrDefault(functionName, 1);
+
+        String label = functionName + "_while" + value;
         String result = RegisterExpressions.ofComp(lhs, rhs, op, label);
-        parent.add(new ComponentStatic(label + ":\n", "", label));
+        parent.add(new ComponentStatic(label + ":\n", label));
         controlStack.add(new ComponentStatic(result));
+
+        // Increment the counter in the map
+        counter.put(functionName, value + 1);
     }
 
     @Override
     public void reset()
     {
-        this.counter = 0;
+        this.counter.clear();
     }
 }

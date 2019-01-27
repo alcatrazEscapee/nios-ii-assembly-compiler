@@ -20,7 +20,7 @@ public class KeywordVariableStore extends AbstractKeyword
     @Override
     public boolean matches(String keyword, StringBuilder inputBuilder)
     {
-        return keyword.endsWith("=") || keyword.equals("*");
+        return (keyword.endsWith("=") && !REGISTERS.contains(keyword.substring(0, keyword.length() - 1))) || keyword.equals("*");
     }
 
     @Override

@@ -4,12 +4,11 @@ import java.util.*;
 
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
-import compiler.component.INamedComponent;
 
 public class IComponentManagerStub implements IComponent, IComponentManager
 {
     private final List<IComponent> components = new ArrayList<>();
-    private final Stack<INamedComponent> controlStack = new Stack<>();
+    private final Stack<IComponent> controlStack = new Stack<>();
     private final Map<String, String> constants = new HashMap<>();
 
     @Override
@@ -43,7 +42,7 @@ public class IComponentManagerStub implements IComponent, IComponentManager
     }
 
     @Override
-    public Stack<INamedComponent> getControlStack()
+    public Stack<IComponent> getControlStack()
     {
         return controlStack;
     }

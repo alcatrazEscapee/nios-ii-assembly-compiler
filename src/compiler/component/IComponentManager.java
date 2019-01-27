@@ -13,7 +13,7 @@ public interface IComponentManager
 
     IComponent getComponent(IComponent.Type type);
 
-    Stack<INamedComponent> getControlStack();
+    Stack<IComponent> getControlStack();
 
     String getConstant(String name);
 

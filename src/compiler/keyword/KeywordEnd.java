@@ -4,7 +4,6 @@ import java.util.Stack;
 
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
-import compiler.component.INamedComponent;
 import compiler.util.InvalidAssemblyException;
 
 public class KeywordEnd implements IKeyword
@@ -30,7 +29,7 @@ public class KeywordEnd implements IKeyword
             throw new InvalidAssemblyException("Unexpected 'end' when parsing " + inputBuilder);
         }
 
-        Stack<INamedComponent> controlStack = compiler.getControlStack();
+        Stack<IComponent> controlStack = compiler.getControlStack();
         if (!controlStack.isEmpty())
         {
             parent.add(controlStack.pop());

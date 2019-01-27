@@ -5,7 +5,6 @@ import java.util.*;
 import compiler.component.ComponentVariable;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
-import compiler.component.INamedComponent;
 import compiler.keyword.*;
 import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
@@ -15,13 +14,13 @@ public enum Compiler implements IComponentManager
     INSTANCE;
 
     public static final String FORMAT_STRING_FIELDS = "\t%-16s%s";
-    public static final String FORMAT_STRING_TABS = "    ";
+    public static final int SPACES_PER_TAB = 4;
 
     // These are ordered by priority
-    private static final Set<IKeyword> KEYWORDS = new HashSet<>(Arrays.asList(new KeywordCompile(), new KeywordMain(), new KeywordIf(), new KeywordElse(), new KeywordWhile(), new KeywordEnd(), new KeywordRegisterExpression(), new KeywordVariable(), new KeywordCall(), new KeywordFunction(), new KeywordVariableStore(), new KeywordComment()));
+    private static final List<IKeyword> KEYWORDS = Arrays.asList(new KeywordCompile(), new KeywordMain(), new KeywordIf(), new KeywordElse(), new KeywordWhile(), new KeywordEnd(), new KeywordCall(), new KeywordFunction(), new KeywordReturn(), new KeywordRegisterExpression(), new KeywordVariable(), new KeywordVariableStore(), new KeywordComment());
 
     private Map<String, String> declaredConstants;
-    private Stack<INamedComponent> controlStack;
+    private Stack<IComponent> controlStack;
     private List<IComponent> componentsAlignedVars;
     private List<IComponent> componentsDefaultVars;
     private List<IComponent> componentsFunctions;
@@ -113,7 +112,8 @@ public enum Compiler implements IComponentManager
         }
 
         outputBuilder.append("\n# End of Assembly Source\n\t.end");
-        return outputBuilder.toString().replace("\t", FORMAT_STRING_TABS);
+        // Replace tabs with spaces - not optional ;)
+        return outputBuilder.toString().replace("\t", new String(new char[SPACES_PER_TAB]).replace('\0', ' '));
     }
 
     @Override
@@ -169,7 +169,7 @@ public enum Compiler implements IComponentManager
     }
 
     @Override
-    public Stack<INamedComponent> getControlStack()
+    public Stack<IComponent> getControlStack()
     {
         return controlStack;
     }

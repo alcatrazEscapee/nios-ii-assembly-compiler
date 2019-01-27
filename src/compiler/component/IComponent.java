@@ -32,12 +32,14 @@ public interface IComponent
     default void add(IComponent sub) {}
 
     /**
-     * Gets the name of the register that this component writes to, if any.
-     * Used to determine how many registers to save in a function header
-     *
-     * @return the register if it writes to it, else none
+     * Gets a flag for the component
+     * Based on usage, various methods will try and parse these flags.
+     *  - if passed to a function, these will be used to determine the write register of the instruction
+     *  - if passed to the control stack, these will be used as the instruction label (for if-else linking)
+     *  - if taken from a function, this will be the name of the function
+     * @return the flag for this component type
      */
-    default String getWriteRegister()
+    default String getFlag()
     {
         return "";
     }

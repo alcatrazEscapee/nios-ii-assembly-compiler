@@ -1,36 +1,26 @@
 package compiler.component;
 
-public class ComponentStatic implements INamedComponent
+public class ComponentStatic implements IComponent
 {
     private final String result;
-    private final String registerWrite;
+    private final String flags;
     private final Type type;
-    private final String label;
 
     public ComponentStatic(String result)
     {
         this(result, "", Type.SUB);
     }
 
-    public ComponentStatic(String result, String registerWrite)
+    public ComponentStatic(String result, String flags)
     {
-        this(result, registerWrite, Type.SUB);
+        this(result, flags, Type.SUB);
     }
 
-    public ComponentStatic(String result, String registerWrite, Type type)
+    public ComponentStatic(String result, String flags, Type type)
     {
         this.type = type;
         this.result = result;
-        this.registerWrite = registerWrite;
-        this.label = "";
-    }
-
-    public ComponentStatic(String result, String registerWrite, String label)
-    {
-        this.type = Type.SUB;
-        this.result = result;
-        this.registerWrite = registerWrite;
-        this.label = label;
+        this.flags = flags;
     }
 
     @Override
@@ -46,14 +36,8 @@ public class ComponentStatic implements INamedComponent
     }
 
     @Override
-    public String getWriteRegister()
+    public String getFlag()
     {
-        return registerWrite;
-    }
-
-    @Override
-    public String getLabel()
-    {
-        return label;
+        return flags;
     }
 }

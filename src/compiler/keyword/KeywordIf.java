@@ -1,18 +1,19 @@
 package compiler.keyword;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
 import compiler.component.ComponentStatic;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
-import compiler.component.INamedComponent;
 import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
 import compiler.util.RegisterExpressions;
 
 public class KeywordIf extends AbstractKeyword
 {
-    private int counter = 0;
+    private final Map<String, Integer> counter = new HashMap<>();
 
     @Override
     public boolean matches(String keyword, StringBuilder inputBuilder)
@@ -25,7 +26,7 @@ public class KeywordIf extends AbstractKeyword
     {
         StringBuilder source = Helpers.nextLine(inputBuilder, ':', false);
         IComponent parent = compiler.getComponent(IComponent.Type.CURRENT);
-        Stack<INamedComponent> controlStack = compiler.getControlStack();
+        Stack<IComponent> controlStack = compiler.getControlStack();
 
         String lhs = getArg(source, COMPARATORS);
         if (!REGISTERS.contains(lhs))
@@ -45,15 +46,22 @@ public class KeywordIf extends AbstractKeyword
             throw new InvalidAssemblyException("Unable to do an if statement with RHS not a register: " + rhs + source);
         }
 
-        String label = "_if" + (++counter);
+        // get the counter for this function
+        String functionName = parent.getFlag();
+        int value = counter.getOrDefault(functionName, 1);
+
+        String label = functionName + "_if" + value;
         String result = RegisterExpressions.ofCompInverted(lhs, rhs, op, label);
         parent.add(new ComponentStatic(result));
-        controlStack.add(new ComponentStatic(label + ":\n", "", label));
+        controlStack.add(new ComponentStatic(label + ":\n", label));
+
+        // Increment the counter in the map
+        counter.put(functionName, value + 1);
     }
 
     @Override
     public void reset()
     {
-        this.counter = 0;
+        this.counter.clear();
     }
 }

@@ -3,7 +3,7 @@ package compiler.keyword;
 public abstract class AbstractKeyword implements IKeyword
 {
     static final String[] ALL = {"<<", ">>", "?^", "?|", "?&", "?/", "+", "-", "*", "/", "=", "&", "|", "^", "[", "]"};
-    static final String[] OPERATORS = {"<<", ">>", "?^", "?|", "?&", "?/", "+", "-", "*", "/", "=", "&", "|", "^"};
+    static final String[] OPERATORS = {"?>>", "<<", ">>", "?^", "?|", "?&", "?/", "+", "-", "*", "/", "=", "&", "|", "^"};
     static final String[] COMPARATORS = {"<=", ">=", "!=", "==", "<", ">"};
 
     String getArg(StringBuilder source, String... delimiters)
@@ -15,11 +15,6 @@ public abstract class AbstractKeyword implements IKeyword
             source.deleteCharAt(0);
         }
         return arg.toString();
-    }
-
-    String getOp(StringBuilder source)
-    {
-        return getOp(source, OPERATORS);
     }
 
     String getOp(StringBuilder source, String... operators)

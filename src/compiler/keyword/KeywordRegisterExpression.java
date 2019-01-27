@@ -61,7 +61,7 @@ public class KeywordRegisterExpression extends AbstractKeyword
             if (REGISTERS.contains(lhs))
             {
                 // Cases: rX = rY OP rz / rX = rY OP IMM / rX = rY
-                String op = getOp(source);
+                String op = getOp(source, OPERATORS);
                 String rhs = getArg(source, ALL);
 
                 if (op.equals(""))
@@ -179,7 +179,7 @@ public class KeywordRegisterExpression extends AbstractKeyword
         else
         {
             // Cases: rX OP= imm / rX OP= rY
-            String op = getOp(source);
+            String op = getOp(source, OPERATORS);
             if (source.charAt(0) != '=')
             {
                 throw new InvalidAssemblyException("Unknown operator with assignment " + op + " " + source);

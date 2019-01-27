@@ -1,6 +1,6 @@
 # Assembly Compiler
 
-This is a trans-compiler which will generate source code for the Nios-II DE0 processor given input in a custom pseudocode.
+This is a trans-compiler which will generate source code for the Nios-II DE0 processor given input in a custom pseudocode (Pseudo-Assembly).
 
 ### Overview
 
@@ -13,25 +13,27 @@ end
 ```
 Breakdown:
 
-`compile nios-ii de0`: This indicates to the compiler that this should be compiled for Nios-II DE0 Assembly. Currently this is the only option, and must be included at the top of every file.
+`compile nios-ii de0`: This indicates that this should be compiled for Nios-II DE0 Assembly. Currently this is the only option, and must be included at the top of every file.
 
 `main:`: This is the declaration of a main function, or entry point. Instructions immediately following this will be executed at runtime.
 
 `end`: This indicates the end of the current block (in this case the main function). Every function (including main) must have a matching `end`.
 
-### Syntax
+### Basic Syntax
 
 Precompiled Assembly consists of single line instructions. Every line must be terminated by either a `;` (for the majority of statements), a `:` (for conditional statements). There are a few exceptions:
 * `compile` requires no line terminator. It must appear first in your program.
-* `end` also requires no line terminator. (Although if you include a `;` the compiler will accept it.)
+* A few control statements don't require a line terminator, but will compile with or without one. As a general rule, include a semicolon after every standard statement, and a colon after every conditional. (`else` should have a colon, `return` should have a semicolon)
 
-Comments start with two forward slashes (`//`). Anything on the rest of that line will be ignored by the compiler. In the case that a comment is inserted within a function, the compiler will generate a Nios-II comment and insert it in the closest spot it can find. The compiler will also insert default "template" comments where nessecary.
+Comments start with two forward slashes (`//`). Anything on the rest of that line will be ignored by the compiler. In the case that a comment is inserted within a function, the compiler will generate a Nios-II comment and insert it in the closest spot it can find. Default "template" comments will also be inserted to document additions to the program where necessary.
 
 ### Operators
 
 Operators are used in register expressions to form the majority of code. They convert two register values, or one register and one immediate value to a single value to be assigned to a result register or memory location.
 
-All Operators:
+As a general rule, operators are similar to C or Java style operators. When an operator is prefixed with a `?`, that typically means an alternate form of the operator (unsigned, logical, or high half-byte)
+
+Standard Operators Syntax:
 * `+`: Addition
 * `-`: Subtraction
 * `*`: Multiplication
@@ -43,9 +45,15 @@ All Operators:
 * `?&`: Bitwise AND high half-byte - Only with immediate values
 * `?|`: Bitwise OR high half-byte - Only with immediate values
 * `?^`: Bitwise XOR high half-byte - Only with immediate values
+* `<<`: Bit shift left
+* `>>`: Bit shift right
+* `?>>`: Bit shift right (logical / unsigned)
 
-All operators can also be added to an `=` to form a assignment-operator. (i.e. `+` -> `+=`.) 
+Unary Operators Syntax:
+* `++`: Increment by one
+* `--`: Decrement by one
 
+All standard operators can also be added to an `=` to form a assignment-operator. (i.e. `+` -> `+=`.) 
 ```
 // These two statements are the same
 r2 = r2 * r4;
@@ -60,7 +68,7 @@ r3 ?&= 0xFF;
 
 Conditionals are very similar to other languages. They must consist of two registers with a conditional operator in the middle.
 
-Included conditionals are:
+Conditional Syntax:
 * `==`: equal to
 * `!=`: Not equal to
 * `<=`: Less than or equal to
@@ -99,7 +107,7 @@ Examples:
 ```
 int anInteger; // Allocates space for an integer
 byte B = 0xF; // a byte with hex value 0xF = 15
-string words = "this is a string. each character is 1 byte");
+string words = "this is a string. each character is 1 byte";
 int anArray = 1, 2, 3, 4, 5, 6; // This declares an array with six concecutive values
 byte ByteArray = 0, 1, 0, 1; // Bytes can be arrays too
 ```
@@ -113,7 +121,7 @@ var[20] largeThing; // This is a 20-byte long piece of memory
 
 ### Control Statements
 
-Precompiled Assembly comes with three main control blocks: `if`, `else`, and `while`. (Note that the `while` loop closer resembles a `do-while` loop in most languages, as it will always execute at least once)
+Precompiled Assembly comes with three main control blocks: `if`, `else`, and `while`. (Note that the `while` loop closer resembles a `do-while` loop in most languages, as it will always execute at least once). It also includes a `return` keyword to immediately break out of a function.
 
 Syntax for `if`:
 ```
@@ -141,6 +149,11 @@ end
 ```
 The statements inside the `while` block will execute at least once, and repeat until the condition is false.
 
+Syntax for `return`:
+```
+return [optional rX];
+```
+If `rX` is not present, this will simply jump to the end of the current function. With an `rX` present, it will insert additional line which will move that register to `r2` (as per convention).
 
 ### Other Functions
 
@@ -166,15 +179,16 @@ Register Expressions are responsible for most lines of code that can be written.
 
 There are a few different ways to use register expressions:
 
-Moves / Assignment
-* `rX = CONSTANT`: Assign a constant value to `rX`.
+Assignment:
 * `rX = rY`: Assign `rY` to `rX`.
+* `rX = CONSTANT`: Assign a constant value to `rX`.
 * `rX = VARIABLE`: Assign `rX` to the value of a variable.
 * `rX = &VARIABLE`: Assign `rX` to the memory address of a variable
 
 Operators:
 * `rX = rY <operator> rZ`: Assign the value of `rY <operator> rZ` to the register `rX`
-* `rX <operator-assignment> rY`: An alias for `rX = rx <operator> rY`.
+* `rX <operator-assignment> rY`: An alias for `rX = rX <operator> rY`.
+* `rX <unary-operator>`: Used with the two unary operators. An alias for `rX = rX <operator> 1`.
 
 Register expressions can also use registers as pointers:
 

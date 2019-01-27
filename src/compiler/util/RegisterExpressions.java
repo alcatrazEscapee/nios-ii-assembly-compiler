@@ -24,6 +24,9 @@ public final class RegisterExpressions
         EXPRESSIONS.put("?&", "andh"); // High half-word operators
         EXPRESSIONS.put("?|", "orh");
         EXPRESSIONS.put("?^", "xorh");
+        EXPRESSIONS.put("<<", "sll");
+        EXPRESSIONS.put(">>", "sra"); // Signed (arithmetic)
+        EXPRESSIONS.put("?>>", "srl"); // Unsigned (logical)
 
         COMPARISONS.put("<=", "ble");
         COMPARISONS.put(">=", "bge");

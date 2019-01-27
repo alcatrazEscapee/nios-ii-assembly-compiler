@@ -6,6 +6,15 @@ import compiler.component.IComponentManager;
 import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
 
+/**
+ * This class is responsible for variable store commands.
+ * This is a special subset of register expressions that don't start with rX.
+ * Each command must match one of the following cases:
+ *
+ * VAR = (cast) rX      ->      st(w/b)(io/) rX, VAR(r0)
+ * *rX = (cast) rY      ->      st(w/b)(io/) rY, 0(rX)
+ * *rX[OFF] = (cast) rY ->      st(w/b)(io/) rY, OFF(rX)
+ */
 public class KeywordVariableStore extends AbstractKeyword
 {
     @Override

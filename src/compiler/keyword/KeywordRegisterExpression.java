@@ -1,6 +1,5 @@
 package compiler.keyword;
 
-import compiler.Compiler;
 import compiler.component.ComponentStatic;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
@@ -8,6 +7,23 @@ import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
 import compiler.util.RegisterExpressions;
 
+/**
+ * This class is responsible for all manner of register expressions
+ * Each expression must be one of the following forms:
+ *
+ * rX = rY              ->      mov rX, rY
+ * rX = IMM             ->      movi rX, IMM
+ * rX = &VAR            ->      movia rX, VAR
+ * rX = (cast) VAR      ->      ld(w/b)(io/) rX, VAR(r0)
+ * rX = (cast) &rY      ->      ld(w/b)(io/) rX, 0(rY)
+ * rX = (cast) &rY[OFF] ->      ld(w/b)(io/) rX, OFF(rY)
+ * rX = rY OP rZ        ->      OP rX, rY, rZ
+ * rX = rY OP IMM       ->      OPi rX, rY, IMM
+ * rX OP= rY            ->      OP rX, rX, rY
+ * rX OP= IMM           ->      OPi rX, rX, IMM
+ *
+ * See {@link RegisterExpressions}
+ */
 public class KeywordRegisterExpression extends AbstractKeyword
 {
     @Override
@@ -43,14 +59,13 @@ public class KeywordRegisterExpression extends AbstractKeyword
 
             if (REGISTERS.contains(lhs))
             {
-                // Cases: rX = rY OP rz / rX = rY OP immediate / rX = rY
+                // Cases: rX = rY OP rz / rX = rY OP IMM / rX = rY
                 String op = getOp(source);
                 String rhs = getArg(source, ALL);
 
                 if (op.equals(""))
                 {
                     // Case: rX = rY
-
                     String result = IComponent.format("mov", keyword + ", " + lhs + "\n");
                     parent.add(new ComponentStatic(result, keyword));
                 }
@@ -62,7 +77,7 @@ public class KeywordRegisterExpression extends AbstractKeyword
                 }
                 else
                 {
-                    // Case: rX = rY OP immediate
+                    // Case: rX = rY OP IMM
                     String result = RegisterExpressions.ofImm(keyword, lhs, op, rhs);
                     parent.add(new ComponentStatic(result, keyword));
                 }
@@ -87,7 +102,7 @@ public class KeywordRegisterExpression extends AbstractKeyword
                 }
 
 
-                // Case: rX = variable / rX = immediate / rX = &variable / rX = &rY
+                // Case: rX = IMM / rX = (cast) &VAR / rX = (cast) &rY
                 if (lhs.length() == 0 && source.charAt(0) == '&')
                 {
                     // Remove the '&'
@@ -95,7 +110,6 @@ public class KeywordRegisterExpression extends AbstractKeyword
                     String rhs = getArg(source, ALL);
                     if (REGISTERS.contains(rhs))
                     {
-                        // Case rX = &rY / rX = &rY[offset]
                         String offset = "0";
 
                         if (source.length() > 0 && source.charAt(0) == '[')
@@ -107,13 +121,14 @@ public class KeywordRegisterExpression extends AbstractKeyword
                             source.deleteCharAt(0);
                         }
 
+                        // Case rX = (cast) &rY / rX = (cast) &rY[OFF]
                         String cmd = makeLoad(byteFlag, ioFlag);
                         String result = IComponent.format(cmd, String.format("%s, %s(%s)\n", keyword, offset, rhs));
                         parent.add(new ComponentStatic(result, keyword));
                     }
                     else
                     {
-                        // Case: rX = &variable
+                        // Case: rX = &VAR
                         String result = IComponent.format("movia", keyword + ", " + rhs + "\n");
                         parent.add(new ComponentStatic(result, keyword));
                     }
@@ -124,17 +139,18 @@ public class KeywordRegisterExpression extends AbstractKeyword
                     {
                         System.out.println("Trying to parse " + lhs);
                         // Account for constants
-                        String var = Compiler.INSTANCE.getConstant(lhs);
+                        String var = compiler.getConstant(lhs);
                         if (var.equals(""))
                         {
                             var = lhs;
                         }
-                        // Account for characters (i.e. 'G'), which are immeadiates, but don't pass Integer#parseInt
+                        // Account for characters (i.e. 'G'), which are immediate, but don't pass Integer#parseInt
                         if (!(var.length() == 3 && var.startsWith("'") && var.endsWith("'")))
                         {
-                            Integer.parseInt(var);
+                            //noinspection ResultOfMethodCallIgnored
+                            Integer.decode(var);
                         }
-                        // Case rX = immediate
+                        // Case rX = IMM
                         String result = IComponent.format("movi", keyword + ", " + lhs + "\n");
                         parent.add(new ComponentStatic(result, keyword));
                     }
@@ -144,14 +160,10 @@ public class KeywordRegisterExpression extends AbstractKeyword
                         // It wasn't an immediate
                         if (source.length() == 0)
                         {
-                            // Case: rX = variable
+                            // Case: rX = (cast) VAR
                             String cmd = makeLoad(byteFlag, ioFlag);
                             String result = IComponent.format(cmd, keyword + ", " + lhs + "(r0)\n");
                             parent.add(new ComponentStatic(result, keyword));
-                        }
-                        else
-                        {
-                            // Case: rX = (cast?) &r3
                         }
                     }
                 }
@@ -165,23 +177,21 @@ public class KeywordRegisterExpression extends AbstractKeyword
             {
                 throw new InvalidAssemblyException("Unknown operator with assignment " + op + " " + source);
             }
+            // Remove the '='
+            source.deleteCharAt(0);
+
+            String rhs = getArg(source, ALL);
+            if (REGISTERS.contains(rhs))
+            {
+                // Case: rX OP= rY
+                String result = RegisterExpressions.of(keyword, keyword, op, rhs);
+                parent.add(new ComponentStatic(result, keyword));
+            }
             else
             {
-                // Cases: rX OP= imm / rX OP= rY
-                source.deleteCharAt(0);
-                String rhs = getArg(source, ALL);
-                if (REGISTERS.contains(rhs))
-                {
-                    // Case: rX OP= rY
-                    String result = RegisterExpressions.of(keyword, keyword, op, rhs);
-                    parent.add(new ComponentStatic(result, keyword));
-                }
-                else
-                {
-                    // Case: rX OP= immediate
-                    String result = RegisterExpressions.ofImm(keyword, keyword, op, rhs);
-                    parent.add(new ComponentStatic(result, keyword));
-                }
+                // Case: rX OP= IMM
+                String result = RegisterExpressions.ofImm(keyword, keyword, op, rhs);
+                parent.add(new ComponentStatic(result, keyword));
             }
         }
     }

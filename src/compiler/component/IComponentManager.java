@@ -14,4 +14,8 @@ public interface IComponentManager
     IComponent getComponent(IComponent.Type type);
 
     Stack<INamedComponent> getControlStack();
+
+    String getConstant(String name);
+
+    void addConstant(String name, String value);
 }

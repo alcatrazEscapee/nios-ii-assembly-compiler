@@ -9,8 +9,18 @@ public interface IComponent
         return String.format(Compiler.FORMAT_STRING_FIELDS, p1, p2);
     }
 
+    /**
+     * The type of the component. Used for accessing from Compile#getComponent
+     *
+     * @return a type
+     */
     Type getType();
 
+
+    /**
+     * This will compile this component recursively (sub-components) into linear assembly text data
+     * @return a string representing the compiled data
+     */
     String compile();
 
     /**

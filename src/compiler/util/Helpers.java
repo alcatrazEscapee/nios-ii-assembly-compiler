@@ -7,6 +7,7 @@
 package compiler.util;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,8 +27,21 @@ public final class Helpers
         }
         catch (IOException e)
         {
-            System.out.println("Error reading file" + e);
+            System.out.println("Error reading file! " + e);
             return "";
+        }
+    }
+
+    public static void saveFile(String fileName, String fileData)
+    {
+        Path filePath = Paths.get(fileName);
+        try (BufferedWriter writer = Files.newBufferedWriter(filePath))
+        {
+            writer.write(fileData);
+        }
+        catch (IOException e)
+        {
+            System.out.println("Error saving file!" + e);
         }
     }
 
@@ -37,7 +51,6 @@ public final class Helpers
         input = input.replaceAll("\r\n", "\n").replaceAll("\r", "\n").replaceAll("\\n+", "\n");
         // Standardize spaces
         input = input.replaceAll("[ \t]+", " ");
-        System.out.println("FORMATTED:\n" + input);
         // Trim leading and ending spaces
         return Arrays.stream(input.split("\n")).map(String::trim).collect(Collectors.toList());
     }

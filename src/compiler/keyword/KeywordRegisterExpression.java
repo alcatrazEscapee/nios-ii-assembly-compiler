@@ -58,7 +58,6 @@ public class KeywordRegisterExpression extends AbstractKeyword
             throw new InvalidAssemblyException("Register expression found outside function");
         }
 
-        System.out.println("Matching a line " + source);
         if (source.charAt(0) == '=')
         {
             source.deleteCharAt(0);
@@ -144,7 +143,6 @@ public class KeywordRegisterExpression extends AbstractKeyword
                 {
                     try
                     {
-                        System.out.println("Trying to parse " + lhs);
                         // Account for constants
                         String var = compiler.getConstant(lhs);
                         if (var.equals(""))
@@ -163,7 +161,6 @@ public class KeywordRegisterExpression extends AbstractKeyword
                     }
                     catch (NumberFormatException e)
                     {
-                        System.out.println("Caught, " + e);
                         // It wasn't an immediate
                         if (source.length() == 0)
                         {

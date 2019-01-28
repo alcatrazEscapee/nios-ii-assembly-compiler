@@ -6,6 +6,9 @@
 
 package compiler.keyword;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import compiler.component.ComponentFunction;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
@@ -14,6 +17,8 @@ import compiler.util.InvalidAssemblyException;
 
 public class KeywordFunction extends AbstractKeyword
 {
+    private final Map<String, String> functionNames = new HashMap<>();
+
     @Override
     public boolean matches(String keyword, StringBuilder inputBuilder)
     {
@@ -28,7 +33,27 @@ public class KeywordFunction extends AbstractKeyword
         {
             throw new InvalidAssemblyException("Function name must be non empty");
         }
-        compiler.addComponent(IComponent.Type.CURRENT, new ComponentFunction(source.toString(), keyword.startsWith("void")));
+        String name = source.toString();
+        if (functionNames.containsKey(name))
+        {
+            throw new InvalidAssemblyException("Can't have multiple functions with the same name");
+        }
+        // Ensure a unique function name -> prefix mapping
+        String shortName = name.replaceAll("[a-z]", "").toLowerCase();
+        String prefix = shortName;
+        int index = 0;
+        while (functionNames.containsValue(prefix))
+        {
+            prefix = shortName + (++index);
+        }
+        functionNames.put(name, prefix);
+        compiler.addComponent(IComponent.Type.CURRENT, new ComponentFunction(name, prefix, keyword.startsWith("void")));
 
+    }
+
+    @Override
+    public void reset()
+    {
+        functionNames.clear();
     }
 }

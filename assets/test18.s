@@ -21,7 +21,7 @@ EarlyReturn:
     br              er_ret
 er_if1:
     subi            r2, r2, 1
-EarlyReturn_ret:
+er_ret:
     ret
 
 # End of Assembly Source

@@ -59,7 +59,6 @@ public class KeywordVariableStore extends AbstractKeyword
             }
 
             // Delete '='
-            System.out.println("source " + source);
             source.deleteCharAt(0);
             String rhs = getArg(source);
 
@@ -109,8 +108,6 @@ public class KeywordVariableStore extends AbstractKeyword
                 byteFlag = ioFlag = true;
                 rhs = rhs.substring(8);
             }
-            System.out.println("Got var name " + varName + " and lhs " + rhs);
-
             // variable = rX
             String cmd = makeStore(byteFlag, ioFlag);
             parent.add(new ComponentStatic(IComponent.format(cmd, rhs + ", " + varName + "(r0)\n")));

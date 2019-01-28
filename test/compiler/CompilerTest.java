@@ -23,7 +23,7 @@ class CompilerTest
     @TestFactory
     Stream<DynamicTest> testMatches()
     {
-        return IntStream.rangeClosed(1, 18).mapToObj(x -> "test" + x).map(x -> DynamicTest.dynamicTest(x, () -> {
+        return IntStream.rangeClosed(1, 19).mapToObj(x -> "test" + x).map(x -> DynamicTest.dynamicTest(x, () -> {
             String inputFile = Helpers.loadFile("assets/" + x + ".sc");
             String outputFile = Helpers.loadFile("assets/" + x + ".s");
             assertEquals(outputFile, Compiler.INSTANCE.compile(inputFile));
@@ -33,10 +33,9 @@ class CompilerTest
     @TestFactory
     Stream<DynamicTest> testExceptions()
     {
-        return IntStream.rangeClosed(1, 3).mapToObj(x -> "exc" + x).map(x -> DynamicTest.dynamicTest(x, () -> {
+        return IntStream.rangeClosed(1, 4).mapToObj(x -> "exc" + x).map(x -> DynamicTest.dynamicTest(x, () -> {
             String inputFile = Helpers.loadFile("assets/" + x + ".sc");
             InvalidAssemblyException t = assertThrows(InvalidAssemblyException.class, () -> Compiler.INSTANCE.compile(inputFile));
-            System.out.println("Message:\n" + t);
         }));
     }
 }

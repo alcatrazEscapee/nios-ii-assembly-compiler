@@ -59,14 +59,11 @@ public enum Compiler implements IComponentManager
                 keywordBuilder.append(Helpers.nextChar(inputBuilder));
 
                 String keyword = keywordBuilder.toString();
-                //System.out.printf("Keyword: [%s]\n", keyword);
 
                 for (IKeyword keywordMatcher : KEYWORDS)
                 {
                     if (keywordMatcher.matches(keyword, inputBuilder))
                     {
-                        System.out.printf("Match: [%s | %s]\n", keyword, keywordMatcher.getClass().getSimpleName());
-
                         keywordMatcher.apply(keyword, inputBuilder, this);
 
                         // Reset keyword and input
@@ -191,4 +188,5 @@ public enum Compiler implements IComponentManager
     {
         declaredConstants.put(name, value);
     }
+
 }

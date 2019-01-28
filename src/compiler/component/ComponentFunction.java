@@ -18,10 +18,10 @@ public class ComponentFunction extends AbstractComponent
     private final String functionPrefix;
     private final boolean noReturnValue;
 
-    public ComponentFunction(String functionName, boolean noReturnValue)
+    public ComponentFunction(String functionName, String functionPrefix, boolean noReturnValue)
     {
         this.functionName = functionName;
-        this.functionPrefix = functionName.replaceAll("[a-z]", "").toLowerCase();
+        this.functionPrefix = functionPrefix;
         this.noReturnValue = noReturnValue;
 
     }
@@ -82,7 +82,7 @@ public class ComponentFunction extends AbstractComponent
         // If necessary, add a return label
         if (returnFlag)
         {
-            output.append(functionName).append("_ret:\n");
+            output.append(functionPrefix).append("_ret:\n");
         }
 
         // Add the addi / ldw commands at the footer

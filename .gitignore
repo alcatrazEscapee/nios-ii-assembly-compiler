@@ -1,7 +1,10 @@
-# Intellij
+# Gradle
+build/
+.gradle/
 
+# Intellij
 .idea/
-out/
-*.xml
-*.html
 *.iml
+
+# Git
+.git/

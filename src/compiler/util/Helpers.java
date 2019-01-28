@@ -50,7 +50,6 @@ public final class Helpers
         return Arrays.stream(input
                 .replaceAll("\r\n", "\n") // Standardize Line Endings
                 .replaceAll("\r", "\n")
-                .replaceAll(";", "\n") // Semicolons are Line Terminators
                 .replaceAll("\\n+", "\n") // Remove Blank Lines
                 .replaceAll("[ \t]+", " ") // Standardize Spacing
                 .split("\n")).map(String::trim).collect(Collectors.toList());

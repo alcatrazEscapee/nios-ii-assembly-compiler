@@ -34,6 +34,9 @@ public class KeywordVariableStore extends AbstractKeyword
     {
         StringBuilder source = Helpers.nextLine(inputBuilder);
         IComponent parent = compiler.getComponent(IComponent.Type.CURRENT);
+        if (parent == null) {
+            throw new InvalidAssemblyException("Variable store found outside function");
+        }
         boolean byteFlag = false, ioFlag = false;
 
         if (keyword.equals("*"))

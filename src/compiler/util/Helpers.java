@@ -47,12 +47,13 @@ public final class Helpers
 
     public static List<String> getLinesUnformatted(String input)
     {
-        // Standardize newlines
-        input = input.replaceAll("\r\n", "\n").replaceAll("\r", "\n").replaceAll("\\n+", "\n");
-        // Standardize spaces
-        input = input.replaceAll("[ \t]+", " ");
-        // Trim leading and ending spaces
-        return Arrays.stream(input.split("\n")).map(String::trim).collect(Collectors.toList());
+        return Arrays.stream(input
+                .replaceAll("\r\n", "\n") // Standardize Line Endings
+                .replaceAll("\r", "\n")
+                .replaceAll(";", "\n") // Semicolons are Line Terminators
+                .replaceAll("\\n+", "\n") // Remove Blank Lines
+                .replaceAll("[ \t]+", " ") // Standardize Spacing
+                .split("\n")).map(String::trim).collect(Collectors.toList());
     }
 
     public static StringBuilder nextLine(StringBuilder source)

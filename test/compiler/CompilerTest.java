@@ -23,7 +23,7 @@ class CompilerTest
     @TestFactory
     Stream<DynamicTest> testMatches()
     {
-        return IntStream.rangeClosed(1, 20).mapToObj(x -> "test" + x).map(x -> DynamicTest.dynamicTest(x, () -> {
+        return IntStream.rangeClosed(1, 22).mapToObj(x -> "test" + x).map(x -> DynamicTest.dynamicTest(x, () -> {
             String inputFile = Helpers.loadFile("assets/" + x + ".sc");
             String outputFile = Helpers.loadFile("assets/" + x + ".s");
             assertEquals(outputFile, Compiler.INSTANCE.compile(inputFile));

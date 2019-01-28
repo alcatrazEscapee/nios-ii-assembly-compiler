@@ -1,5 +1,5 @@
 /*
- * Part of AssemblyCompiler by Alex O'Neill
+ * Part of AssemblyCompiler
  * Copyright (c) 2019 - 2019 Alex O'Neill
  * See the project LICENCE.md for more information
  */

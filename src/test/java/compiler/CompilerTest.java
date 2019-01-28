@@ -1,5 +1,5 @@
 /*
- * Part of AssemblyCompiler by Alex O'Neill
+ * Part of AssemblyCompiler
  * Copyright (c) 2019 - 2019 Alex O'Neill
  * See the project LICENCE.md for more information
  */
@@ -7,17 +7,16 @@
 package compiler;
 
 
-import compiler.util.Helpers;
-import compiler.util.InvalidAssemblyException;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.TestFactory;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
+import compiler.util.InvalidAssemblyException;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
 

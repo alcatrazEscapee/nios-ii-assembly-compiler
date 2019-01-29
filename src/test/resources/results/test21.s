@@ -20,13 +20,13 @@ Factorial:
     stw             r3, 4(sp)
     stw             ra, 0(sp)
 
-    bne             r3, r0, f_if1
-    br              f_ret
-f_if1:
+    bne             r3, r0, fac_if1
+    br              fac_ret
+fac_if1:
     mul             r2, r2, r3
     subi            r3, r3, 1
     call            Factorial
-f_ret:
+fac_ret:
 
     ldw             r3, 4(sp)
     ldw             ra, 0(sp)

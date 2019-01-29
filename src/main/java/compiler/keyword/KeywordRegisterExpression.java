@@ -150,7 +150,7 @@ public class KeywordRegisterExpression extends AbstractKeyword
                             var = lhs;
                         }
                         // Account for characters (i.e. 'G'), which are immediate, but don't pass Integer#parseInt
-                        if (!(var.length() == 3 && var.startsWith("'") && var.endsWith("'")))
+                        if (!(var.startsWith("'") && var.endsWith("'")))
                         {
                             //noinspection ResultOfMethodCallIgnored
                             Integer.decode(var);

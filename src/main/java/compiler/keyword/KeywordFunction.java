@@ -39,7 +39,11 @@ public class KeywordFunction extends AbstractKeyword
             throw new InvalidAssemblyException("Can't have multiple functions with the same name");
         }
         // Ensure a unique function name -> prefix mapping
-        String shortName = name.replaceAll("[a-z]", "").toLowerCase();
+        String shortName = name.replaceAll("[a-z0-9]", "").toLowerCase();
+        if (shortName.length() <= 1)
+        {
+            shortName = name.toLowerCase().substring(0, 3);
+        }
         String prefix = shortName;
         int index = 0;
         while (functionNames.containsValue(prefix))

@@ -53,7 +53,7 @@ Unary Operators Syntax:
 * `++`: Increment by one
 * `--`: Decrement by one
 
-All standard operators can also be added to an `=` to form a assignment-operator. (i.e. `+` -> `+=`.) 
+All standard operators can also be added to an `=` to form a assignment-operator. (i.e. `+` -> `+=`.)
 ```
 // These two statements are the same
 r2 = r2 * r4
@@ -62,6 +62,13 @@ r2 *= r4
 // As are these two
 r3 = r3 ?& 0xFF
 r3 ?&= 0xFF
+```
+
+Additionally, you can use conditionals as operators. They are translated into comparison (`cmp..`) operators.
+
+```
+r3 = r4 <= r2
+r3 = r4 != r2
 ```
 
 ### Conditionals
@@ -75,6 +82,10 @@ Conditional Syntax:
 * `<`: Strictly less than
 * `>=`: Greater than or equal to
 * `>`: Strictly greater than
+* `?<=`: Less than or equal to (Unsigned)
+* `?<`: Strictly less than (Unsigned)
+* `?>=`: Greater than or equal to (Unsigned)
+* `?>`: Strictly greater than (Unsigned)
 
 Example Usage:
 ```

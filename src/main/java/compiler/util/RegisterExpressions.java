@@ -33,6 +33,16 @@ public final class RegisterExpressions
         EXPRESSIONS.put("<<", "sll");
         EXPRESSIONS.put(">>", "sra"); // Signed (arithmetic)
         EXPRESSIONS.put("?>>", "srl"); // Unsigned (logical)
+        EXPRESSIONS.put("==", "cmpeq"); // Logical Comparisons (signed values)
+        EXPRESSIONS.put("!=", "cmpne");
+        EXPRESSIONS.put(">=", "cmpge");
+        EXPRESSIONS.put(">", "cmpgt");
+        EXPRESSIONS.put("<", "cmplt");
+        EXPRESSIONS.put("<=", "cmple");
+        EXPRESSIONS.put("?>=", "cmpgeu"); // Unsigned >=
+        EXPRESSIONS.put("?<=", "cmpleu"); // Unsigned <=
+        EXPRESSIONS.put("?<", "cmpltu"); // Unsigned <
+        EXPRESSIONS.put("?>", "cmpgtu"); // Unsigned >
 
         COMPARISONS.put("<=", "ble");
         COMPARISONS.put(">=", "bge");
@@ -40,6 +50,10 @@ public final class RegisterExpressions
         COMPARISONS.put("!=", "bne");
         COMPARISONS.put("<", "blt");
         COMPARISONS.put(">", "bgt");
+        COMPARISONS.put("?<=", "bleu"); // Unsigned comparisons
+        COMPARISONS.put("?>=", "bgeu");
+        COMPARISONS.put("?<", "bltu");
+        COMPARISONS.put("?>", "bgtu");
 
         COMPARISONS_INVERTED.put("<=", "bgt");
         COMPARISONS_INVERTED.put(">=", "blt");
@@ -47,6 +61,10 @@ public final class RegisterExpressions
         COMPARISONS_INVERTED.put("!=", "beq");
         COMPARISONS_INVERTED.put("<", "bge");
         COMPARISONS_INVERTED.put(">", "ble");
+        COMPARISONS_INVERTED.put("?<=", "bgtu"); // Unsigned comparisons
+        COMPARISONS_INVERTED.put("?>=", "bltu");
+        COMPARISONS_INVERTED.put("?<", "bgeu");
+        COMPARISONS_INVERTED.put("?>", "bleu");
     }
 
     public static String of(String rX, String rY, String op, String rZ)
@@ -55,7 +73,7 @@ public final class RegisterExpressions
         {
             throw new InvalidAssemblyException("Unknown operation " + op);
         }
-        if (op.startsWith("?") && !op.equals("?/"))
+        if (op.equals("?|") || op.equals("?&") || op.equals("?^"))
         {
             throw new InvalidAssemblyException("'hi' operators can only be used with immediate values");
         }

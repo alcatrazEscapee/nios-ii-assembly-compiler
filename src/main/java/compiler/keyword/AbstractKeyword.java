@@ -8,9 +8,9 @@ package compiler.keyword;
 
 public abstract class AbstractKeyword implements IKeyword
 {
-    static final String[] ALL = {"<<", ">>", "?^", "?|", "?&", "?/", "+", "-", "*", "/", "=", "&", "|", "^", "[", "]"};
-    static final String[] OPERATORS = {"?>>", "<<", ">>", "?^", "?|", "?&", "?/", "+", "-", "*", "/", "=", "&", "|", "^"};
-    static final String[] COMPARATORS = {"<=", ">=", "!=", "==", "<", ">"};
+    static final String[] ALL = {"<", ">", "?", "+", "-", "*", "/", "=", "&", "|", "^", "[", "]", "!"};
+    static final String[] OPERATORS = {"?>>", "?<=", "?>=", ">=", "<=", "?<", "?>", "==", "!=", "<<", ">>", "?^", "?|", "?&", "?/", ">", "<", "+", "-", "*", "/", "=", "&", "|", "^"};
+    static final String[] COMPARATORS = {"?<=", "?>=", "?<", "?>", "<=", ">=", "!=", "==", "<", ">"};
 
     String getArg(StringBuilder source, String... delimiters)
     {

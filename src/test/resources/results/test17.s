@@ -12,11 +12,21 @@
 # Entry point
 _start:
     movia           sp, LAST_RAM_WORD
-    movia           r2, message
+    # Print prompt
+    movia           r2, promptText
     call            PrintString
-    movia           r2, list
-    ldw             r3, size(r0)
-    call            PrintHexList
+    # Get decimal digits
+    call            GetDecimal99
+    # Move temp copy to r3
+    mov             r3, r2
+    # Print result
+    movia           r2, resultText
+    call            PrintString
+    # Print the decimal digits
+    mov             r2, r3
+    call            PrintDecimal99
+    movi            r2, '\n'
+    call            PrintChar
 _end:
     br              _end
 
@@ -27,6 +37,7 @@ PrintString:
     stw             r3, 4(sp)
     stw             ra, 0(sp)
 
+    # arguments: r2 = string pointer
     mov             r3, r2
     ldb             r2, 0(r3)
 ps_while1:
@@ -47,6 +58,7 @@ PrintChar:
     stw             r3, 4(sp)
     stw             r4, 0(sp)
 
+    # arguments: r2 = character value
     movia           r3, JTAG_UART_BASE
 pc_while1:
     ldwio           r4, STATUS_OFFSET(r3)
@@ -59,68 +71,108 @@ pc_while1:
     addi            sp, sp, 8
     ret
 
-# ========== PrintHexDigit ==========
-PrintHexDigit:
-    subi            sp, sp, 12
-    stw             r2, 8(sp)
-    stw             r4, 4(sp)
-    stw             ra, 0(sp)
-
-    # Takes r3 as an argument
-    subi            r4, r3, 10
-    bge             r4, r0, phd_if1
-    addi            r2, r3, '0'
-    br              phd_else1
-phd_if1:
-    addi            r2, r3, 'A'
-phd_else1:
-    call            PrintChar
-
-    ldw             r2, 8(sp)
-    ldw             r4, 4(sp)
-    ldw             ra, 0(sp)
-    addi            sp, sp, 12
-    ret
-
-# ========== PrintHexList ==========
-PrintHexList:
+# ========== GetDecimal99 ==========
+GetDecimal99:
     subi            sp, sp, 16
-    stw             r2, 12(sp)
-    stw             r3, 8(sp)
-    stw             r4, 4(sp)
+    stw             r3, 12(sp)
+    stw             r4, 8(sp)
+    stw             r5, 4(sp)
     stw             ra, 0(sp)
 
-    # r2 = the list pointer
-    # r3 = the size of the list
-    mov             r4, r2
-phl_while1:
-    ldw             r2, 0(r4)
-    call            PrintHexDigit
-    movi            r2, ','
+    # Gets two decimal values as input from the user
+    # r2 = character
+    # r3 = result
+    # r4 = constant '0'
+    movi            r4, '0'
+    # r5 = constant '9'
+    movi            r5, '9'
+gd_while1:
+gd_while2:
+    call            GetChar
+    bgt             r2, r5, gd_while2
+    blt             r2, r4, gd_while1
     call            PrintChar
-    subi            r3, r3, 1
-    addi            r4, r4, 4
-    bgt             r3, r0, phl_while1
+    # Calculate tens digit
+    subi            r3, r2, '0'
+    muli            r3, r3, 10
+gd_while3:
+gd_while4:
+    call            GetChar
+    bgt             r2, r5, gd_while4
+    blt             r2, r4, gd_while3
+    call            PrintChar
+    subi            r2, r2, '0'
+    add             r3, r3, r2
+    # return result
+    mov             r2, r3
 
-    ldw             r2, 12(sp)
-    ldw             r3, 8(sp)
-    ldw             r4, 4(sp)
+    ldw             r3, 12(sp)
+    ldw             r4, 8(sp)
+    ldw             r5, 4(sp)
     ldw             ra, 0(sp)
     addi            sp, sp, 16
     ret
 
-# Word-Aligned Variables
-    .org            0x00001000
+# ========== GetChar ==========
+GetChar:
+    subi            sp, sp, 8
+    stw             r3, 4(sp)
+    stw             r4, 0(sp)
 
-list:
-    .word           0, 1, 4, 9, 13, 15
-size:
-    .word           6
+    # Gets a single character as input
+    # Returns in r2
+    movia           r3, JTAG_UART_BASE
+gc_while1:
+    # Read JTAG data register
+    ldwio           r2, DATA_OFFSET(r3)
+    andi            r4, r2, 0x8000
+    beq             r4, r0, gc_while1
+    # return data & 0xFF
+    andi            r2, r2, 0xFF
+
+    ldw             r3, 4(sp)
+    ldw             r4, 0(sp)
+    addi            sp, sp, 8
+    ret
+
+# ========== PrintDecimal99 ==========
+PrintDecimal99:
+    subi            sp, sp, 16
+    stw             r10, 12(sp)
+    stw             r2, 8(sp)
+    stw             r3, 4(sp)
+    stw             ra, 0(sp)
+
+    # Prints two decimal values to the output
+    # arguments: r2 = value in [0, 99]
+    # local copy of value
+    mov             r3, r2
+    # tens digit
+    # no divi :(
+    movi            r10, 10
+    div             r2, r3, r10
+    addi            r2, r2, '0'
+    call            PrintChar
+    # ones digit
+    div             r2, r3, r10
+    muli            r2, r2, 10
+    sub             r2, r3, r2
+    addi            r2, r2, '0'
+    call            PrintChar
+
+    ldw             r10, 12(sp)
+    ldw             r2, 8(sp)
+    ldw             r3, 4(sp)
+    ldw             ra, 0(sp)
+    addi            sp, sp, 16
+    ret
 
 # Random Variables
 
-message:
-    .asciz          "Hello World!\n"
+promptText:
+    .asciz          "ELEC 274 Lab 3\nType two decimal digits: "
+resultText:
+    .asciz          "\nYou typed: "
 
 # End of Assembly Source
     .end

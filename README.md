@@ -227,10 +227,8 @@ There are various examples of valid Pseudo-Assembly and the corresponding assemb
 * `test1`: The default program
 * `test3`: Demo of variable declarations
 * `test5`: Demo of various operators and assignment statements
-* `test7`: ELEC 274 Lab 1
 * `test9`: Example If Syntax
 * `test12`: Example If-Else Syntax
 * `test14`: Solution to Project Euler Problem 1
-* `test17`: ELEC 274 Lab 2
-* `test22`: An example selection sort
+* `test21`: An example selection sort
 

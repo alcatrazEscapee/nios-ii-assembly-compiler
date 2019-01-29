@@ -8,34 +8,36 @@
 # Entry point
 _start:
     movia           sp, LAST_RAM_WORD
-    ldw             r2, A(r0)
-    ldw             r3, B(r0)
-    call            AddValues
-    stw             r2, C(r0)
+    movi            r2, 1
+    ldw             r3, x(r0)
+    call            Factorial
 _end:
     br              _end
 
-# ========== AddValues ==========
-AddValues:
-    subi            sp, sp, 4
-    stw             r16, 0(sp)
+# ========== Factorial ==========
+Factorial:
+    subi            sp, sp, 8
+    stw             r3, 4(sp)
+    stw             ra, 0(sp)
 
-    add             r16, r2, r3
-    mov             r2, r16
+    bne             r3, r0, fac_if1
+    br              fac_ret
+fac_if1:
+    mul             r2, r2, r3
+    subi            r3, r3, 1
+    call            Factorial
+fac_ret:
 
-    ldw             r16, 0(sp)
-    addi            sp, sp, 4
+    ldw             r3, 4(sp)
+    ldw             ra, 0(sp)
+    addi            sp, sp, 8
     ret
 
 # Word-Aligned Variables
     .org            0x00001000
 
-A:
-    .word           3
-B:
-    .word           5
-C:
-    .skip           4
+x:
+    .word           10
 
 # End of Assembly Source
     .end

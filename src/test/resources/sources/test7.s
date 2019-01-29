@@ -1,18 +1,18 @@
-// ELEC 274 Lab 1
 compile nios-ii de0
 
-int A = 3;
-int B = 5;
-int C;
+int x = 10;
 
 main:
-    r2 = A;
-    r3 = B;
-    call AddValues;
-    C = r2;
+    r2 = 1
+    r3 = x
+    call Factorial
 end
 
-function AddValues:
-    r16 = r2 + r3;
-    r2 = r16;
+function Factorial:
+    if r3 == r0:
+        return
+    end
+    r2 *= r3
+    r3--
+    call Factorial
 end

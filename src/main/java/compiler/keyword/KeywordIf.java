@@ -17,6 +17,8 @@ import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
 import compiler.util.RegisterExpressions;
 
+import static compiler.component.IComponent.Flag.FUNCTION_PREFIX;
+
 public class KeywordIf extends AbstractKeyword
 {
     private final Map<String, Integer> counter = new HashMap<>();
@@ -53,13 +55,13 @@ public class KeywordIf extends AbstractKeyword
         }
 
         // get the counter for this function
-        String functionName = parent.getFlag();
+        String functionName = parent.getFlag(FUNCTION_PREFIX);
         int value = counter.getOrDefault(functionName, 1);
 
         String label = functionName + "_if" + value;
         String result = RegisterExpressions.ofCompInverted(lhs, rhs, op, label);
         parent.add(new ComponentStatic(result));
-        controlStack.add(new ComponentStatic(label + ":\n", label));
+        controlStack.add(new ComponentStatic(label + ":\n").setFlag(IComponent.Flag.LABEL_NAME, label));
 
         // Increment the counter in the map
         counter.put(functionName, value + 1);

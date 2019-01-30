@@ -24,6 +24,9 @@ public class ComponentFunction extends AbstractComponent
         this.functionPrefix = functionPrefix;
         this.noReturnValue = noReturnValue;
 
+        setFlag(Flag.FUNCTION_NAME, functionName);
+        setFlag(Flag.FUNCTION_PREFIX, functionPrefix);
+
     }
 
     @Override
@@ -35,7 +38,7 @@ public class ComponentFunction extends AbstractComponent
     @Override
     public String compile()
     {
-        StringBuilder output = new StringBuilder();
+        final StringBuilder output = new StringBuilder();
         boolean returnFlag = false;
         output.append(String.format("\n# ========== %s ==========\n", functionName));
         output.append(functionName).append(":\n");
@@ -44,7 +47,7 @@ public class ComponentFunction extends AbstractComponent
         List<String> registerWrites = new ArrayList<>();
         for (IComponent cmp : components)
         {
-            String flag = cmp.getFlag();
+            String flag = cmp.getFlag(Flag.WRITE_REGISTER);
             if (IKeyword.REGISTERS.contains(flag) && (!flag.equals("r2") || noReturnValue))
             {
                 if (!registerWrites.contains(flag))
@@ -101,11 +104,5 @@ public class ComponentFunction extends AbstractComponent
         // Add the return command
         output.append("\tret\n");
         return output.toString();
-    }
-
-    @Override
-    public String getFlag()
-    {
-        return functionPrefix;
     }
 }

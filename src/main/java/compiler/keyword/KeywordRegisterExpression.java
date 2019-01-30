@@ -13,6 +13,8 @@ import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
 import compiler.util.RegisterExpressions;
 
+import static compiler.component.IComponent.Flag.WRITE_REGISTER;
+
 /**
  * This class is responsible for all manner of register expressions
  * Each expression must be one of the following forms:
@@ -73,19 +75,19 @@ public class KeywordRegisterExpression extends AbstractKeyword
                 {
                     // Case: rX = rY
                     String result = IComponent.format("mov", keyword + ", " + lhs + "\n");
-                    parent.add(new ComponentStatic(result, keyword));
+                    parent.add(new ComponentStatic(result).setFlag(WRITE_REGISTER, keyword));
                 }
                 else if (REGISTERS.contains(rhs))
                 {
                     // Case: rX = rY OP rZ
                     String result = RegisterExpressions.of(keyword, lhs, op, rhs);
-                    parent.add(new ComponentStatic(result, keyword));
+                    parent.add(new ComponentStatic(result).setFlag(WRITE_REGISTER, keyword));
                 }
                 else
                 {
                     // Case: rX = rY OP IMM
                     String result = RegisterExpressions.ofImm(keyword, lhs, op, rhs);
-                    parent.add(new ComponentStatic(result, keyword));
+                    parent.add(new ComponentStatic(result).setFlag(WRITE_REGISTER, keyword));
                 }
             }
             else
@@ -130,13 +132,13 @@ public class KeywordRegisterExpression extends AbstractKeyword
                         // Case rX = (cast) &rY / rX = (cast) &rY[OFF]
                         String cmd = makeLoad(byteFlag, ioFlag);
                         String result = IComponent.format(cmd, String.format("%s, %s(%s)\n", keyword, offset, rhs));
-                        parent.add(new ComponentStatic(result, keyword));
+                        parent.add(new ComponentStatic(result).setFlag(WRITE_REGISTER, keyword));
                     }
                     else
                     {
                         // Case: rX = &VAR
                         String result = IComponent.format("movia", keyword + ", " + rhs + "\n");
-                        parent.add(new ComponentStatic(result, keyword));
+                        parent.add(new ComponentStatic(result).setFlag(WRITE_REGISTER, keyword));
                     }
                 }
                 else
@@ -157,7 +159,7 @@ public class KeywordRegisterExpression extends AbstractKeyword
                         }
                         // Case rX = IMM
                         String result = IComponent.format("movi", keyword + ", " + lhs + "\n");
-                        parent.add(new ComponentStatic(result, keyword));
+                        parent.add(new ComponentStatic(result).setFlag(WRITE_REGISTER, keyword));
                     }
                     catch (NumberFormatException e)
                     {
@@ -167,7 +169,7 @@ public class KeywordRegisterExpression extends AbstractKeyword
                             // Case: rX = (cast) VAR
                             String cmd = makeLoad(byteFlag, ioFlag);
                             String result = IComponent.format(cmd, keyword + ", " + lhs + "(r0)\n");
-                            parent.add(new ComponentStatic(result, keyword));
+                            parent.add(new ComponentStatic(result).setFlag(WRITE_REGISTER, keyword));
                         }
                     }
                 }
@@ -177,7 +179,7 @@ public class KeywordRegisterExpression extends AbstractKeyword
         {
             // Case: rX UOP
             String result = RegisterExpressions.ofImm(keyword, keyword, String.valueOf(source.charAt(0)), "1");
-            parent.add(new ComponentStatic(result, keyword));
+            parent.add(new ComponentStatic(result).setFlag(WRITE_REGISTER, keyword));
         }
         else
         {
@@ -195,13 +197,13 @@ public class KeywordRegisterExpression extends AbstractKeyword
             {
                 // Case: rX OP= rY
                 String result = RegisterExpressions.of(keyword, keyword, op, rhs);
-                parent.add(new ComponentStatic(result, keyword));
+                parent.add(new ComponentStatic(result).setFlag(WRITE_REGISTER, keyword));
             }
             else
             {
                 // Case: rX OP= IMM
                 String result = RegisterExpressions.ofImm(keyword, keyword, op, rhs);
-                parent.add(new ComponentStatic(result, keyword));
+                parent.add(new ComponentStatic(result).setFlag(WRITE_REGISTER, keyword));
             }
         }
     }

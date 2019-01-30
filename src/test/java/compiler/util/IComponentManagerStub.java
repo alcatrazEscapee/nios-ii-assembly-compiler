@@ -16,6 +16,7 @@ public class IComponentManagerStub implements IComponent, IComponentManager
     private final List<IComponent> components = new ArrayList<>();
     private final Stack<IComponent> controlStack = new Stack<>();
     private final Map<String, String> constants = new HashMap<>();
+    private final Map<Flag, String> flags = new EnumMap<>(Flag.class);
 
     @Override
     public Type getType()
@@ -63,5 +64,18 @@ public class IComponentManagerStub implements IComponent, IComponentManager
     public void addConstant(String name, String value)
     {
         constants.put(name, value);
+    }
+
+    @Override
+    public String getFlag(Flag type)
+    {
+        return flags.getOrDefault(type, "");
+    }
+
+    @Override
+    public IComponent setFlag(Flag type, String flag)
+    {
+        flags.put(type, flag);
+        return this;
     }
 }

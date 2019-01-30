@@ -12,6 +12,9 @@ import compiler.component.IComponentManager;
 import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
 
+import static compiler.component.IComponent.Flag.FUNCTION_PREFIX;
+import static compiler.component.IComponent.Flag.WRITE_REGISTER;
+
 public class KeywordReturn implements IKeyword
 {
     @Override
@@ -39,12 +42,12 @@ public class KeywordReturn implements IKeyword
 
             // Add the quick move flag
             String result = IComponent.format("mov", "r2, " + reg + "\n");
-            parent.add(new ComponentStatic(result, "r2"));
+            parent.add(new ComponentStatic(result).setFlag(WRITE_REGISTER, "r2"));
         }
 
         // Add a default return
-        String functionName = parent.getFlag();
+        String functionName = parent.getFlag(FUNCTION_PREFIX);
         String result = IComponent.format("br", functionName + "_ret\n");
-        parent.add(new ComponentStatic(result, "return"));
+        parent.add(new ComponentStatic(result).setFlag(WRITE_REGISTER, "return"));
     }
 }

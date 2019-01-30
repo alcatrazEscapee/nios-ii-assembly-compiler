@@ -6,7 +6,7 @@
 
 package compiler.component;
 
-public class ComponentVariable implements IComponent
+public class ComponentVariable extends AbstractComponent
 {
     private final String result;
     private final boolean isWordAligned;

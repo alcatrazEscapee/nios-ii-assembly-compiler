@@ -8,6 +8,7 @@ package compiler.component;
 
 public class ComponentCompile extends AbstractComponent
 {
+
     @Override
     public Type getType()
     {

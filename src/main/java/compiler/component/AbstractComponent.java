@@ -7,20 +7,37 @@
 package compiler.component;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class AbstractComponent implements IComponent
 {
-    List<IComponent> components;
+    final List<IComponent> components;
+    final Map<Flag, String> flags;
 
     AbstractComponent()
     {
         this.components = new ArrayList<>();
+        this.flags = new EnumMap<>(Flag.class);
     }
 
     @Override
     public void add(IComponent sub)
     {
         components.add(sub);
+    }
+
+    @Override
+    public String getFlag(Flag type)
+    {
+        return flags.getOrDefault(type, "");
+    }
+
+    @Override
+    public IComponent setFlag(Flag type, String flag)
+    {
+        flags.put(type, flag);
+        return this;
     }
 }

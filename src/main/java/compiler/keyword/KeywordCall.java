@@ -25,6 +25,6 @@ public class KeywordCall extends AbstractKeyword
         StringBuilder source = Helpers.nextLine(inputBuilder);
         IComponent parent = compiler.getComponent(IComponent.Type.CURRENT);
         // This needs to signal that it writes to the return address register
-        parent.add(new ComponentStatic(IComponent.format("call", source + "\n"), "ra"));
+        parent.add(new ComponentStatic(IComponent.format("call", source + "\n")).setFlag(IComponent.Flag.WRITE_REGISTER, "ra"));
     }
 }

@@ -17,6 +17,9 @@ import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
 import compiler.util.RegisterExpressions;
 
+import static compiler.component.IComponent.Flag.FUNCTION_PREFIX;
+import static compiler.component.IComponent.Flag.LABEL_NAME;
+
 public class KeywordWhile extends AbstractKeyword
 {
     private Map<String, Integer> counter = new HashMap<>();
@@ -40,12 +43,12 @@ public class KeywordWhile extends AbstractKeyword
             if (lhs.equals("true"))
             {
                 // get the counter for this function
-                String functionName = parent.getFlag();
+                String functionName = parent.getFlag(FUNCTION_PREFIX);
                 int value = counter.getOrDefault(functionName, 1);
 
                 String label = "_while" + value;
                 String result = IComponent.format("br", label) + "\n";
-                parent.add(new ComponentStatic(label + ":\n", label));
+                parent.add(new ComponentStatic(label + ":\n").setFlag(LABEL_NAME, label));
                 controlStack.add(new ComponentStatic(result));
 
                 // Increment the counter in the map
@@ -69,12 +72,12 @@ public class KeywordWhile extends AbstractKeyword
 
         // This is almost identical to the if statement logic, except the component placement is reversed (label first, break after)
         // get the counter for this function
-        String functionName = parent.getFlag();
+        String functionName = parent.getFlag(FUNCTION_PREFIX);
         int value = counter.getOrDefault(functionName, 1);
 
         String label = functionName + "_while" + value;
         String result = RegisterExpressions.ofComp(lhs, rhs, op, label);
-        parent.add(new ComponentStatic(label + ":\n", label));
+        parent.add(new ComponentStatic(label + ":\n").setFlag(LABEL_NAME, label));
         controlStack.add(new ComponentStatic(result));
 
         // Increment the counter in the map

@@ -6,27 +6,22 @@
 
 package compiler.component;
 
-public class ComponentStatic implements IComponent
+import compiler.util.InvalidAssemblyException;
+
+public class ComponentStatic extends AbstractComponent
 {
     private final String result;
-    private final String flags;
     private final Type type;
 
     public ComponentStatic(String result)
     {
-        this(result, "", Type.SUB);
+        this(result, Type.SUB);
     }
 
-    public ComponentStatic(String result, String flags)
-    {
-        this(result, flags, Type.SUB);
-    }
-
-    public ComponentStatic(String result, String flags, Type type)
+    public ComponentStatic(String result, Type type)
     {
         this.type = type;
         this.result = result;
-        this.flags = flags;
     }
 
     @Override
@@ -42,8 +37,8 @@ public class ComponentStatic implements IComponent
     }
 
     @Override
-    public String getFlag()
+    public void add(IComponent sub)
     {
-        return flags;
+        throw new InvalidAssemblyException("Can't add a sub-statement to a static component");
     }
 }

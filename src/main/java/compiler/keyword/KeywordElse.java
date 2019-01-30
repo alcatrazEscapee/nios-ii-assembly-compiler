@@ -13,6 +13,8 @@ import compiler.component.IComponent;
 import compiler.component.IComponentManager;
 import compiler.util.InvalidAssemblyException;
 
+import static compiler.component.IComponent.Flag.LABEL_NAME;
+
 public class KeywordElse extends AbstractKeyword
 {
     @Override
@@ -36,15 +38,15 @@ public class KeywordElse extends AbstractKeyword
         {
             throw new InvalidAssemblyException("Unexpected 'else' outside of a function " + inputBuilder);
         }
-        if (controlStack.isEmpty() || !controlStack.peek().getFlag().contains("_if"))
+        if (controlStack.isEmpty() || !controlStack.peek().getFlag(LABEL_NAME).contains("_if"))
         {
             throw new InvalidAssemblyException("Unknown element on control stack, expected '_if'");
         }
         IComponent componentIf = controlStack.pop();
-        String labelIf = componentIf.getFlag();
+        String labelIf = componentIf.getFlag(LABEL_NAME);
         String labelElse = labelIf.replaceAll("_if", "_else");
 
-        controlStack.add(new ComponentStatic(labelElse + ":\n", labelElse));
+        controlStack.add(new ComponentStatic(labelElse + ":\n").setFlag(LABEL_NAME, labelElse));
         parent.add(new ComponentStatic(IComponent.format("br", labelElse + "\n")));
         parent.add(componentIf);
     }

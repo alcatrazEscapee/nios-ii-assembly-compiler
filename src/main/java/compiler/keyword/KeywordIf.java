@@ -10,14 +10,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
-import compiler.component.ComponentStatic;
+import compiler.component.ComponentLabel;
+import compiler.component.Components;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
 import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
 import compiler.util.RegisterExpressions;
 
-import static compiler.component.IComponent.Flag.*;
+import static compiler.component.IComponent.Flag.FUNCTION_PREFIX;
+import static compiler.component.IComponent.Flag.TYPE;
 
 public class KeywordIf extends AbstractKeyword
 {
@@ -59,9 +61,9 @@ public class KeywordIf extends AbstractKeyword
         int value = counter.getOrDefault(functionName, 1);
 
         String label = functionName + "_if" + value;
-        String result = RegisterExpressions.ofCompInverted(lhs, rhs, op, label);
-        parent.add(new ComponentStatic(result).setFlag(TYPE, "break_conditional").setFlag(LABEL, label));
-        controlStack.add(new ComponentStatic(label + ":\n").setFlag(LABEL, label).setFlag(TYPE, "label"));
+        String result = RegisterExpressions.ofCompInverted(lhs, rhs, op, "%s");
+        parent.add(new ComponentLabel(result, label).setFlag(TYPE, "break_conditional"));
+        controlStack.add(Components.label(label));
 
         // Increment the counter in the map
         counter.put(functionName, value + 1);

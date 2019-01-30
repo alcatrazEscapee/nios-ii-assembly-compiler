@@ -10,11 +10,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import compiler.component.ComponentLabel;
 import compiler.component.ComponentStatic;
+import compiler.component.Components;
 import compiler.component.IComponent;
+import compiler.util.Optimizer;
 import org.junit.jupiter.api.Test;
 
-import static compiler.component.IComponent.Flag.LABEL;
 import static compiler.component.IComponent.Flag.TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -25,12 +27,14 @@ class OptimizerTest
     {
         // Multiple Consecutive Labels and then Consecutive Break - Label
         List<IComponent> list = components(
-                new ComponentStatic(IComponent.format("beq", "r0, r0, labelB\n")).setFlag(TYPE, "break_conditional").setFlag(LABEL, "labelB"),
-                new ComponentStatic("labelA:\n").setFlag(TYPE, "label").setFlag(LABEL, "labelA"),
-                new ComponentStatic("labelB:\n").setFlag(TYPE, "label").setFlag(LABEL, "labelB")
+                new ComponentLabel(IComponent.format("beq", "r0, r0, %s\n"), "labelB").setFlag(TYPE, "break_conditional"),
+                Components.label("labelA"),
+                Components.label("labelB"),
+                Components.br("labelA")
         );
         Optimizer.accept(list);
-        assertEquals("labelA:\n", compile(list));
+        assertEquals("labelA:\n" +
+                "\tbr              labelA\n", compile(list));
     }
 
     @Test
@@ -38,12 +42,14 @@ class OptimizerTest
     {
         // Unreachable Statement
         List<IComponent> list = components(
-                new ComponentStatic(IComponent.format("br", "labelA\n")).setFlag(TYPE, "break").setFlag(LABEL, "labelA"),
+                new ComponentLabel("%s:\n", "labelA").setFlag(TYPE, "label"),
+                Components.br("labelA"),
                 new ComponentStatic(IComponent.format("add", "r0, r0, r0\n")),
-                new ComponentStatic(IComponent.format("br", "labelB\n")).setFlag(TYPE, "break").setFlag(LABEL, "labelB")
+                Components.br("labelB")
         );
         Optimizer.accept(list);
-        assertEquals("\tbr              labelA\n", compile(list));
+        assertEquals("labelA:\n" +
+                "\tbr              labelA\n", compile(list));
     }
 
     @Test
@@ -51,13 +57,14 @@ class OptimizerTest
     {
         // Consecutive Break - Label
         List<IComponent> list = components(
-                new ComponentStatic(IComponent.format("br", "labelA\n")).setFlag(TYPE, "break").setFlag(LABEL, "labelA"),
-                new ComponentStatic("labelA:\n").setFlag(TYPE, "label").setFlag(LABEL, "labelA"),
-                new ComponentStatic(IComponent.format("beq", "r0, r0, labelB\n")).setFlag(TYPE, "break_conditional").setFlag(LABEL, "labelB")
+                Components.label("labelB"),
+                Components.br("labelA"),
+                Components.label("labelA"),
+                new ComponentLabel(IComponent.format("beq", "r0, r0, %s\n"), "labelB").setFlag(TYPE, "break_conditional")
         );
         Optimizer.accept(list);
         assertEquals("labelA:\n" +
-                "\tbeq             r0, r0, labelB\n", compile(list));
+                "\tbeq             r0, r0, labelA\n", compile(list));
     }
 
     @Test
@@ -65,15 +72,30 @@ class OptimizerTest
     {
         // Consecutive Label - Break
         List<IComponent> list = components(
-                new ComponentStatic(IComponent.format("beq", "r0, r0, labelA\n")).setFlag(TYPE, "break_conditional").setFlag(LABEL, "labelA"),
+                Components.label("labelB"),
+                new ComponentLabel(IComponent.format("beq", "r0, r0, %s\n"), "labelA").setFlag(TYPE, "break_conditional"),
                 new ComponentStatic(IComponent.format("add", "r0, r0, r0\n")),
-                new ComponentStatic("labelA:\n").setFlag(TYPE, "label").setFlag(LABEL, "labelA"),
-                new ComponentStatic(IComponent.format("br", "labelB\n")).setFlag(TYPE, "break").setFlag(LABEL, "labelB")
+                Components.label("labelA"),
+                Components.br("labelB")
         );
         Optimizer.accept(list);
-        assertEquals("\tbeq             r0, r0, labelB\n" +
+        assertEquals("labelB:\n" +
+                "\tbeq             r0, r0, labelB\n" +
                 "\tadd             r0, r0, r0\n" +
                 "\tbr              labelB\n", compile(list));
+    }
+
+    @Test
+    void accept5()
+    {
+        // Unused Labels
+        List<IComponent> list = components(
+                Components.label("labelA"),
+                Components.label("labelB"),
+                Components.br("labelC")
+        );
+        Optimizer.accept(list);
+        assertEquals("", compile(list));
     }
 
     private List<IComponent> components(IComponent... components)

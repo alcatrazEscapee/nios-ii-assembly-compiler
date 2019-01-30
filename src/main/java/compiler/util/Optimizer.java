@@ -4,7 +4,7 @@
  * See the project LICENCE.md for more information
  */
 
-package compiler.optimizer;
+package compiler.util;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -18,8 +18,6 @@ public final class Optimizer
 {
     public static void accept(List<IComponent> base)
     {
-        // Searching for patterns of two length
-
         IOptimizer optimizer = list -> {};
         do
         {
@@ -28,7 +26,7 @@ public final class Optimizer
             // Reset the optimizer
             optimizer = null;
 
-            // Search for potential optimizations
+            // Search for potential optimizations between two statements
             for (int i = 0; i < base.size() - 1; i++)
             {
                 // Get components
@@ -69,7 +67,7 @@ public final class Optimizer
                 }
 
                 // Consecutive Label - Break
-                if (first.getFlag(TYPE).equals("label") && second.getFlag(TYPE).equals("break"))
+                if (first.getFlag(TYPE).equals("label") && second.getFlag(TYPE).equals("break") && !first.getFlag(LABEL).equals(second.getFlag(LABEL)))
                 {
                     optimizer = list -> {
                         // Remove the first label and replace it with the second
@@ -85,6 +83,22 @@ public final class Optimizer
                         }
                     };
                     break;
+                }
+            }
+
+            for (int i = 0; i < base.size(); i++)
+            {
+                String label = base.get(i).getFlag(LABEL);
+                if (!label.equals(""))
+                {
+                    // Count instances of label appearance
+                    long count = base.stream().filter(x -> x.getFlag(LABEL).equals(label)).count();
+                    if (count <= 1)
+                    {
+                        final int index = i;
+                        optimizer = list -> list.remove(index);
+                        break;
+                    }
                 }
             }
 

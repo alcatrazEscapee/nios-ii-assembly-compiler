@@ -8,13 +8,12 @@ package compiler.keyword;
 
 import java.util.Stack;
 
-import compiler.component.ComponentStatic;
+import compiler.component.Components;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
 import compiler.util.InvalidAssemblyException;
 
 import static compiler.component.IComponent.Flag.LABEL;
-import static compiler.component.IComponent.Flag.TYPE;
 
 public class KeywordElse extends AbstractKeyword
 {
@@ -47,8 +46,8 @@ public class KeywordElse extends AbstractKeyword
         String labelIf = componentIf.getFlag(LABEL);
         String labelElse = labelIf.replaceAll("_if", "_else");
 
-        controlStack.add(new ComponentStatic(labelElse + ":\n").setFlag(LABEL, labelElse).setFlag(TYPE, "label"));
-        parent.add(new ComponentStatic(IComponent.format("br", labelElse + "\n")).setFlag(TYPE, "break").setFlag(LABEL, labelElse));
+        controlStack.add(Components.label(labelElse));
+        parent.add(Components.br(labelElse));
         parent.add(componentIf);
     }
 }

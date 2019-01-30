@@ -10,9 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
-import compiler.component.ComponentStatic;
-import compiler.component.IComponent;
-import compiler.component.IComponentManager;
+import compiler.component.*;
 import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
 import compiler.util.RegisterExpressions;
@@ -75,9 +73,9 @@ public class KeywordWhile extends AbstractKeyword
         int value = counter.getOrDefault(functionName, 1);
 
         String label = functionName + "_while" + value;
-        String result = RegisterExpressions.ofComp(lhs, rhs, op, label);
-        parent.add(new ComponentStatic(label + ":\n").setFlag(LABEL, label).setFlag(TYPE, "label"));
-        controlStack.add(new ComponentStatic(result).setFlag(TYPE, "break_conditional").setFlag(LABEL, label));
+        String result = RegisterExpressions.ofComp(lhs, rhs, op, "%s");
+        parent.add(Components.label(label));
+        controlStack.add(new ComponentLabel(result, label).setFlag(TYPE, "break_conditional"));
 
         // Increment the counter in the map
         counter.put(functionName, value + 1);

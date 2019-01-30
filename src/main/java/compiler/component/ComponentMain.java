@@ -6,7 +6,7 @@
 
 package compiler.component;
 
-import compiler.optimizer.Optimizer;
+import compiler.util.Optimizer;
 
 public class ComponentMain extends AbstractComponent
 {

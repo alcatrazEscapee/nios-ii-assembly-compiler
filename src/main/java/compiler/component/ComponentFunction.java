@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 import compiler.keyword.IKeyword;
-import compiler.optimizer.Optimizer;
+import compiler.util.Optimizer;
 
 public class ComponentFunction extends AbstractComponent
 {

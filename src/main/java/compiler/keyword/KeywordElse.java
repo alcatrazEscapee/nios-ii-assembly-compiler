@@ -13,7 +13,8 @@ import compiler.component.IComponent;
 import compiler.component.IComponentManager;
 import compiler.util.InvalidAssemblyException;
 
-import static compiler.component.IComponent.Flag.LABEL_NAME;
+import static compiler.component.IComponent.Flag.LABEL;
+import static compiler.component.IComponent.Flag.TYPE;
 
 public class KeywordElse extends AbstractKeyword
 {
@@ -38,16 +39,16 @@ public class KeywordElse extends AbstractKeyword
         {
             throw new InvalidAssemblyException("Unexpected 'else' outside of a function " + inputBuilder);
         }
-        if (controlStack.isEmpty() || !controlStack.peek().getFlag(LABEL_NAME).contains("_if"))
+        if (controlStack.isEmpty() || !controlStack.peek().getFlag(LABEL).contains("_if"))
         {
             throw new InvalidAssemblyException("Unknown element on control stack, expected '_if'");
         }
         IComponent componentIf = controlStack.pop();
-        String labelIf = componentIf.getFlag(LABEL_NAME);
+        String labelIf = componentIf.getFlag(LABEL);
         String labelElse = labelIf.replaceAll("_if", "_else");
 
-        controlStack.add(new ComponentStatic(labelElse + ":\n").setFlag(LABEL_NAME, labelElse));
-        parent.add(new ComponentStatic(IComponent.format("br", labelElse + "\n")));
+        controlStack.add(new ComponentStatic(labelElse + ":\n").setFlag(LABEL, labelElse).setFlag(TYPE, "label"));
+        parent.add(new ComponentStatic(IComponent.format("br", labelElse + "\n")).setFlag(TYPE, "break").setFlag(LABEL, labelElse));
         parent.add(componentIf);
     }
 }

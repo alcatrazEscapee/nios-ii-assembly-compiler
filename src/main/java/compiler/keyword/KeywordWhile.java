@@ -17,8 +17,7 @@ import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
 import compiler.util.RegisterExpressions;
 
-import static compiler.component.IComponent.Flag.FUNCTION_PREFIX;
-import static compiler.component.IComponent.Flag.LABEL_NAME;
+import static compiler.component.IComponent.Flag.*;
 
 public class KeywordWhile extends AbstractKeyword
 {
@@ -48,8 +47,8 @@ public class KeywordWhile extends AbstractKeyword
 
                 String label = "_while" + value;
                 String result = IComponent.format("br", label) + "\n";
-                parent.add(new ComponentStatic(label + ":\n").setFlag(LABEL_NAME, label));
-                controlStack.add(new ComponentStatic(result));
+                parent.add(new ComponentStatic(label + ":\n").setFlag(LABEL, label).setFlag(TYPE, "label"));
+                controlStack.add(new ComponentStatic(result).setFlag(LABEL, label).setFlag(TYPE, "break"));
 
                 // Increment the counter in the map
                 counter.put(functionName, value + 1);
@@ -77,8 +76,8 @@ public class KeywordWhile extends AbstractKeyword
 
         String label = functionName + "_while" + value;
         String result = RegisterExpressions.ofComp(lhs, rhs, op, label);
-        parent.add(new ComponentStatic(label + ":\n").setFlag(LABEL_NAME, label));
-        controlStack.add(new ComponentStatic(result));
+        parent.add(new ComponentStatic(label + ":\n").setFlag(LABEL, label).setFlag(TYPE, "label"));
+        controlStack.add(new ComponentStatic(result).setFlag(TYPE, "break_conditional").setFlag(LABEL, label));
 
         // Increment the counter in the map
         counter.put(functionName, value + 1);

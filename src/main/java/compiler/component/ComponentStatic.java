@@ -10,7 +10,7 @@ import compiler.util.InvalidAssemblyException;
 
 public class ComponentStatic extends AbstractComponent
 {
-    private final String result;
+    private String result;
     private final Type type;
 
     public ComponentStatic(String result)
@@ -34,6 +34,21 @@ public class ComponentStatic extends AbstractComponent
     public String compile()
     {
         return result;
+    }
+
+    @Override
+    public IComponent setFlag(Flag type, String flag)
+    {
+        // Update label
+        if (type == Flag.LABEL)
+        {
+            String oldLabel = getFlag(Flag.LABEL);
+            if (!oldLabel.equals(""))
+            {
+                result = result.replace(getFlag(Flag.LABEL), flag);
+            }
+        }
+        return super.setFlag(type, flag);
     }
 
     @Override

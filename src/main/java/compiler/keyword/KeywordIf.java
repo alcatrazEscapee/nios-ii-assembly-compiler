@@ -17,7 +17,7 @@ import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
 import compiler.util.RegisterExpressions;
 
-import static compiler.component.IComponent.Flag.FUNCTION_PREFIX;
+import static compiler.component.IComponent.Flag.*;
 
 public class KeywordIf extends AbstractKeyword
 {
@@ -60,8 +60,8 @@ public class KeywordIf extends AbstractKeyword
 
         String label = functionName + "_if" + value;
         String result = RegisterExpressions.ofCompInverted(lhs, rhs, op, label);
-        parent.add(new ComponentStatic(result));
-        controlStack.add(new ComponentStatic(label + ":\n").setFlag(IComponent.Flag.LABEL_NAME, label));
+        parent.add(new ComponentStatic(result).setFlag(TYPE, "break_conditional").setFlag(LABEL, label));
+        controlStack.add(new ComponentStatic(label + ":\n").setFlag(LABEL, label).setFlag(TYPE, "label"));
 
         // Increment the counter in the map
         counter.put(functionName, value + 1);

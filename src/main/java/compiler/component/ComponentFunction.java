@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 import compiler.keyword.IKeyword;
+import compiler.optimizer.Optimizer;
 
 public class ComponentFunction extends AbstractComponent
 {
@@ -38,6 +39,9 @@ public class ComponentFunction extends AbstractComponent
     @Override
     public String compile()
     {
+        // Optimize!
+        Optimizer.accept(components);
+
         final StringBuilder output = new StringBuilder();
         boolean returnFlag = false;
         output.append(String.format("\n# ========== %s ==========\n", functionName));

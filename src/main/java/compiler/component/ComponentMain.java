@@ -6,6 +6,8 @@
 
 package compiler.component;
 
+import compiler.optimizer.Optimizer;
+
 public class ComponentMain extends AbstractComponent
 {
     @Override
@@ -17,6 +19,9 @@ public class ComponentMain extends AbstractComponent
     @Override
     public String compile()
     {
+        // Optimizer!
+        Optimizer.accept(components);
+
         StringBuilder output = new StringBuilder();
         output.append("# Entry point\n").append("_start:\n").append(IComponent.format("movia", "sp, LAST_RAM_WORD\n"));
         for (IComponent cmp : components)

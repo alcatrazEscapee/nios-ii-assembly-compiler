@@ -68,9 +68,7 @@ public interface IComponent
         TYPE,
         FUNCTION_NAME,
         FUNCTION_PREFIX,
-        TARGET_LABEL,
-        RESULT_LABEL,
-        LABEL_NAME,
+        LABEL,
         WRITE_REGISTER
     }
 }

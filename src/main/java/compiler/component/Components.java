@@ -23,4 +23,9 @@ public final class Components
     {
         return new ComponentLabel(IComponent.format("br", "%s\n"), label).setFlag(TYPE, "break");
     }
+
+    public static IComponent noop()
+    {
+        return new ComponentStatic(IComponent.format("add", "r0, r0, r0\n"));
+    }
 }

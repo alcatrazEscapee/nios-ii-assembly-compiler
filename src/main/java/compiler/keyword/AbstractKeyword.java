@@ -6,12 +6,8 @@
 
 package compiler.keyword;
 
-public abstract class AbstractKeyword implements IKeyword
+abstract class AbstractKeyword implements IKeyword
 {
-    static final String[] ALL = {"<", ">", "?", "+", "-", "*", "/", "=", "&", "|", "^", "[", "]", "!"};
-    static final String[] OPERATORS = {"?>>", "?<=", "?>=", ">=", "<=", "?<", "?>", "==", "!=", "<<", ">>", "?^", "?|", "?&", "?/", ">", "<", "+", "-", "*", "/", "=", "&", "|", "^"};
-    static final String[] COMPARATORS = {"?<=", "?>=", "?<", "?>", "<=", ">=", "!=", "==", "<", ">"};
-
     String getArg(StringBuilder source, String... delimiters)
     {
         StringBuilder arg = new StringBuilder();

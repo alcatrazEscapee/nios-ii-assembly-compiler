@@ -18,7 +18,7 @@ public final class Optimizer
 {
     public static void accept(List<IComponent> base)
     {
-        IOptimizer optimizer = list -> {};
+        Consumer<List<IComponent>> optimizer = list -> {};
         do
         {
             // Run the last found optimization
@@ -105,6 +105,4 @@ public final class Optimizer
             // Repeat until no possible optimizations are found
         } while (optimizer != null);
     }
-
-    interface IOptimizer extends Consumer<List<IComponent>> {}
 }

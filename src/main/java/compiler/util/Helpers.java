@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -92,5 +93,23 @@ public final class Helpers
         char c = source.charAt(0);
         source.deleteCharAt(0);
         return c;
+    }
+
+    public static String getFromList(StringBuilder source, String... list)
+    {
+        return getFromList(source, Arrays.asList(list));
+    }
+
+    public static String getFromList(StringBuilder source, Collection<String> list)
+    {
+        for (String s : list)
+        {
+            if (source.length() >= s.length() && source.substring(0, s.length()).equals(s))
+            {
+                source.delete(0, s.length());
+                return s;
+            }
+        }
+        return "";
     }
 }

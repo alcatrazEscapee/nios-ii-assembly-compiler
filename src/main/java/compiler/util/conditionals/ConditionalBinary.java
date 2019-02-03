@@ -13,7 +13,7 @@ import java.util.List;
 import compiler.component.Components;
 import compiler.component.IComponent;
 
-public abstract class ConditionalBinary implements IConditional
+public abstract class ConditionalBinary extends AbstractConditional
 {
     final IConditional inner;
     private final String name;
@@ -38,9 +38,9 @@ public abstract class ConditionalBinary implements IConditional
         }
 
         @Override
-        public List<IComponent> compile()
+        public List<IComponent> build()
         {
-            List<IComponent> components = new ArrayList<>(inner.compile());
+            List<IComponent> components = new ArrayList<>(inner.build());
             Collections.addAll(components,
                     Components.label(inner.getName() + "_t"),
                     Components.br(getName() + "_f"),

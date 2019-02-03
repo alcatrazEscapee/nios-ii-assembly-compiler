@@ -13,24 +13,24 @@ _start:
     movi            r4, 1
     movi            r6, 0
     # Loop until back to zero
-_while1:
+main_while1:
     subi            r5, r5, 1
     # decrement r3 and reset to 5
-    bne             r3, r0, _if1
+    bne             r3, r0, main_if1
     movi            r3, 5
-_if1:
+main_if1:
     subi            r3, r3, 1
     # decrement r4 and reset to 3
-    bne             r4, r0, _if2
+    bne             r4, r0, main_if2
     movi            r4, 3
-_if2:
+main_if2:
     subi            r4, r4, 1
     # if either counter is zero, add the result
     mul             r7, r3, r4
-    bne             r7, r0, _if3
+    bne             r7, r0, main_if3
     add             r6, r6, r5
-_if3:
-    bgt             r5, r0, _while1
+main_if3:
+    bgt             r5, r0, main_while1
 _end:
     br              _end
 

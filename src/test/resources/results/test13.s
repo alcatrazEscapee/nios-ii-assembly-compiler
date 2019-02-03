@@ -9,9 +9,9 @@
 _start:
     movia           sp, LAST_RAM_WORD
     movi            r5, 1000
-_while1:
+main_while1:
     subi            r5, r5, 1
-    bgt             r5, r0, _while1
+    bgt             r5, r0, main_while1
 _end:
     br              _end
 

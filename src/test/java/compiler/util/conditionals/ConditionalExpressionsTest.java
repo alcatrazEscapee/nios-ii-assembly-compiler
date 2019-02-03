@@ -171,30 +171,25 @@ class ConditionalExpressionsTest
 
     private void test(String exp, String test)
     {
-        List<IComponent> components = ConditionalExpressions.create("test", Helpers.nextLine(new StringBuilder(test))).compile();
-        assertEquals(exp, compile(components));
+        List<IComponent> components = ConditionalExpressions.create("test", Helpers.nextLine(new StringBuilder(test))).build();
+        assertEquals(exp, Helpers.reduceCollection(components, IComponent::compile));
     }
 
     private void testOptimized(String exp, String test)
     {
-        List<IComponent> components = ConditionalExpressions.create("test", Helpers.nextLine(new StringBuilder(test))).compile();
+        List<IComponent> components = ConditionalExpressions.create("test", Helpers.nextLine(new StringBuilder(test))).build();
         Collections.addAll(components,
                 Components.noop(),
                 Components.label("test_a_t"),
                 Components.noop(),
                 Components.label("test_a_f")
         );
-        Optimizer.accept(components);
-        assertEquals(exp, compile(components));
+        Optimizer.accept(components, "simplify_names");
+        assertEquals(exp, Helpers.reduceCollection(components, IComponent::compile));
 
         // Everything should pass this second test, as there are no outside labels, so everything should be optimized away as unused
-        components = ConditionalExpressions.create("test", Helpers.nextLine(new StringBuilder(test))).compile();
-        Optimizer.accept(components);
-        assertEquals("", compile(components));
-    }
-
-    private String compile(List<IComponent> components)
-    {
-        return components.stream().map(IComponent::compile).reduce((x, y) -> x + y).orElse("");
+        components = ConditionalExpressions.create("test", Helpers.nextLine(new StringBuilder(test))).build();
+        Optimizer.accept(components, "simplify_names");
+        assertEquals("", Helpers.reduceCollection(components, IComponent::compile));
     }
 }

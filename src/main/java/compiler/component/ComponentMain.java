@@ -10,6 +10,12 @@ import compiler.util.Optimizer;
 
 public class ComponentMain extends AbstractComponent
 {
+    public ComponentMain()
+    {
+        setFlag(Flag.FUNCTION_NAME, "main");
+        setFlag(Flag.FUNCTION_PREFIX, "main");
+    }
+
     @Override
     public Type getType()
     {

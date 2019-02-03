@@ -21,7 +21,7 @@ import static compiler.component.IComponent.Flag.TYPE;
 import static compiler.keyword.IKeyword.COMPARATORS;
 import static compiler.keyword.IKeyword.REGISTERS;
 
-public class ConditionalBase implements IConditional
+public class ConditionalBase extends AbstractConditional
 {
     private final String name;
     private final List<IComponent> components;
@@ -56,7 +56,7 @@ public class ConditionalBase implements IConditional
     }
 
     @Override
-    public List<IComponent> compile()
+    public List<IComponent> build()
     {
         return components;
     }

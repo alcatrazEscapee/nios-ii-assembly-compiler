@@ -8,12 +8,12 @@
 # Entry point
 _start:
     movia           sp, LAST_RAM_WORD
-    ble             r2, r0, _if1
+    ble             r2, r0, main_if1
     movi            r3, 1
-    br              _else1
-_if1:
+    br              main_else1
+main_if1:
     movi            r3, 2
-_else1:
+main_else1:
 _end:
     br              _end
 

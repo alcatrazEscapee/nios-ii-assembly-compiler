@@ -13,7 +13,7 @@ import java.util.List;
 import compiler.component.Components;
 import compiler.component.IComponent;
 
-public abstract class ConditionalLogical implements IConditional
+public abstract class ConditionalLogical extends AbstractConditional
 {
     final IConditional lhs, rhs;
     private final String op;
@@ -41,11 +41,11 @@ public abstract class ConditionalLogical implements IConditional
         }
 
         @Override
-        public List<IComponent> compile()
+        public List<IComponent> build()
         {
-            List<IComponent> components = new ArrayList<>(lhs.compile());
+            List<IComponent> components = new ArrayList<>(lhs.build());
             components.add(Components.label(lhs.getName() + "_f"));
-            components.addAll(rhs.compile());
+            components.addAll(rhs.build());
             Collections.addAll(components,
                     Components.label(rhs.getName() + "_t"),
                     Components.label(lhs.getName() + "_t"),
@@ -65,11 +65,11 @@ public abstract class ConditionalLogical implements IConditional
         }
 
         @Override
-        public List<IComponent> compile()
+        public List<IComponent> build()
         {
-            List<IComponent> components = new ArrayList<>(lhs.compile());
+            List<IComponent> components = new ArrayList<>(lhs.build());
             components.add(Components.label(lhs.getName() + "_t"));
-            components.addAll(rhs.compile());
+            components.addAll(rhs.build());
             Collections.addAll(components,
                     Components.label(rhs.getName() + "_t"),
                     Components.br(getName() + "_t"),

@@ -15,6 +15,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public final class Helpers
@@ -111,5 +112,26 @@ public final class Helpers
             }
         }
         return "";
+    }
+
+    public static <T> String reduceCollection(Collection<T> items, Function<T, String> mappingFunction)
+    {
+        return items.stream().map(mappingFunction).reduce((x, y) -> x + y).orElse("");
+    }
+
+    public static String alphabetSuffix(int n)
+    {
+        /*
+         Source: https://stackoverflow.com/questions/8710719/generating-an-alphabetic-sequence-in-java
+         This generates the sequence a, b, c, ... y, z, aa, ab, ac ... az, ba ...
+         */
+        char[] buf = new char[(int) Math.floor(Math.log(25 * (n + 1)) / Math.log(26))];
+        for (int i = buf.length - 1; i >= 0; i--)
+        {
+            n--;
+            buf[i] = (char) ('a' + n % 26);
+            n /= 26;
+        }
+        return new String(buf);
     }
 }

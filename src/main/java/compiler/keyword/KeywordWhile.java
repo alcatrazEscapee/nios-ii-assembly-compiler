@@ -10,10 +10,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
-import compiler.component.*;
+import compiler.component.ComponentStatic;
+import compiler.component.Components;
+import compiler.component.IComponent;
+import compiler.component.IComponentManager;
 import compiler.util.Helpers;
-import compiler.util.InvalidAssemblyException;
-import compiler.util.RegisterExpressions;
+import compiler.util.conditionals.ConditionalExpressions;
+import compiler.util.conditionals.IConditional;
 
 import static compiler.component.IComponent.Flag.*;
 
@@ -34,37 +37,20 @@ public class KeywordWhile extends AbstractKeyword
         IComponent parent = compiler.getComponent(IComponent.Type.CURRENT);
         Stack<IComponent> controlStack = compiler.getControlStack();
 
-        String lhs = getArg(source, COMPARATORS);
-        if (!REGISTERS.contains(lhs))
+        if (source.toString().equals("true"))
         {
-            if (lhs.equals("true"))
-            {
-                // get the counter for this function
-                String functionName = parent.getFlag(FUNCTION_PREFIX);
-                int value = counter.getOrDefault(functionName, 1);
+            // get the counter for this function
+            String functionName = parent.getFlag(FUNCTION_PREFIX);
+            int value = counter.getOrDefault(functionName, 1);
 
-                String label = "_while" + value;
-                String result = IComponent.format("br", label) + "\n";
-                parent.add(new ComponentStatic(label + ":\n").setFlag(LABEL, label).setFlag(TYPE, "label"));
-                controlStack.add(new ComponentStatic(result).setFlag(LABEL, label).setFlag(TYPE, "break"));
+            String label = "_while" + value;
+            String result = IComponent.format("br", label) + "\n";
+            parent.add(new ComponentStatic(label + ":\n").setFlag(LABEL, label).setFlag(TYPE, "label"));
+            controlStack.add(new ComponentStatic(result).setFlag(LABEL, label).setFlag(TYPE, "break"));
 
-                // Increment the counter in the map
-                counter.put(functionName, value + 1);
-                return;
-            }
-            throw new InvalidAssemblyException("Unable to do an while statement with LHS not a register: " + lhs + source);
-        }
-
-        String op = getOp(source, COMPARATORS);
-        if (op.equals(""))
-        {
-            throw new InvalidAssemblyException("Unknown comparison operator " + source);
-        }
-
-        String rhs = getArg(source, ":");
-        if (!REGISTERS.contains(rhs))
-        {
-            throw new InvalidAssemblyException("Unable to do an while statement with RHS not a register: " + rhs + source);
+            // Increment the counter in the map
+            counter.put(functionName, value + 1);
+            return;
         }
 
         // This is almost identical to the if statement logic, except the component placement is reversed (label first, break after)
@@ -73,9 +59,9 @@ public class KeywordWhile extends AbstractKeyword
         int value = counter.getOrDefault(functionName, 1);
 
         String label = functionName + "_while" + value;
-        String result = RegisterExpressions.ofComp(lhs, rhs, op, "%s");
-        parent.add(Components.label(label));
-        controlStack.add(new ComponentLabel(result, label).setFlag(TYPE, "break_conditional"));
+        IConditional condition = ConditionalExpressions.create(label, source);
+        parent.add(Components.label(label + "_a_t"));
+        controlStack.add(condition);
 
         // Increment the counter in the map
         counter.put(functionName, value + 1);

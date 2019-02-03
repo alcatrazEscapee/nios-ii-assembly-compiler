@@ -8,11 +8,11 @@
 # Entry point
 _start:
     movia           sp, LAST_RAM_WORD
-_while1:
+main_while1:
     addi            r1, r1, 1
-    blt             r3, r0, _while1
-    blt             r1, r2, _while1
-    blt             r0, r3, _while1
+    blt             r3, r0, main_while1
+    blt             r1, r2, main_while1
+    blt             r0, r3, main_while1
 _end:
     br              _end
 

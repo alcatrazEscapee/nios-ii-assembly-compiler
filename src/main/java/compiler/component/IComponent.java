@@ -60,7 +60,8 @@ public interface IComponent
         VARIABLE,
         FUNCTION,
         CURRENT,
-        SUB
+        SUB,
+        CONDITIONAL
     }
 
     enum Flag

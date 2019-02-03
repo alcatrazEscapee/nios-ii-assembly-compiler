@@ -11,6 +11,7 @@ import java.util.Stack;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
 import compiler.util.InvalidAssemblyException;
+import compiler.util.conditionals.IConditional;
 
 public class KeywordEnd implements IKeyword
 {
@@ -38,7 +39,15 @@ public class KeywordEnd implements IKeyword
         Stack<IComponent> controlStack = compiler.getControlStack();
         if (!controlStack.isEmpty())
         {
-            parent.add(controlStack.pop());
+            IComponent cmp = controlStack.pop();
+            if (cmp instanceof IConditional)
+            {
+                ((IConditional) cmp).build().forEach(parent::add);
+            }
+            else
+            {
+                parent.add(cmp);
+            }
         }
         else
         {

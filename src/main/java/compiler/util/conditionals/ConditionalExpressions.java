@@ -6,11 +6,12 @@
 
 package compiler.util.conditionals;
 
+import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
 
 public final class ConditionalExpressions
 {
-    static IConditional create(String name, StringBuilder source)
+    public static IConditional create(String name, StringBuilder source)
     {
         Solver wrapper = new ConditionalExpressions.Solver(name);
         return wrapper.parse(source);
@@ -99,19 +100,7 @@ public final class ConditionalExpressions
 
         private String nextName()
         {
-            /*
-             Source: https://stackoverflow.com/questions/8710719/generating-an-alphabetic-sequence-in-java
-             This generates the sequence a, b, c, ... y, z, aa, ab, ac ... az, ba ...
-             */
-            int n = ++suffixCounter;
-            char[] buf = new char[(int) Math.floor(Math.log(25 * (n + 1)) / Math.log(26))];
-            for (int i = buf.length - 1; i >= 0; i--)
-            {
-                n--;
-                buf[i] = (char) ('a' + n % 26);
-                n /= 26;
-            }
-            return name + "_" + new String(buf);
+            return name + "_" + Helpers.alphabetSuffix(++suffixCounter);
         }
     }
 }

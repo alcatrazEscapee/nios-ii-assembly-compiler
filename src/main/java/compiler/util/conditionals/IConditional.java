@@ -10,9 +10,15 @@ import java.util.List;
 
 import compiler.component.IComponent;
 
-public interface IConditional
+public interface IConditional extends IComponent
 {
-    List<IComponent> compile();
+    List<IComponent> build();
 
     String getName();
+
+    @Override
+    default Type getType()
+    {
+        return Type.CONDITIONAL;
+    }
 }

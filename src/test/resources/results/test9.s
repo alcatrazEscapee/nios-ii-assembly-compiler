@@ -9,9 +9,9 @@
 _start:
     movia           sp, LAST_RAM_WORD
     movi            r2, 1
-    ble             r0, r1, _if1
+    ble             r0, r1, main_if1
     movi            r2, 2
-_if1:
+main_if1:
     movi            r2, 3
 _end:
     br              _end

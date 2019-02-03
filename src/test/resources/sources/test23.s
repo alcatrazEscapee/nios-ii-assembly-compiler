@@ -1,11 +1,11 @@
 compile nios-ii de0
 
 main:
-    //if r0 >= r1 and (r2 == r3 or r4 != r5):
+    if r0 >= r1 and (r2 == r3 or r4 != r5):
         call TestLoops
-    //else
+    else
         call TestLoops2
-    //end
+    end
 end
 
 void function TestLoops:

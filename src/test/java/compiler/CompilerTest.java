@@ -37,7 +37,7 @@ class CompilerTest
     {
         return IntStream.rangeClosed(1, 4).mapToObj(x -> "exc" + x).map(x -> DynamicTest.dynamicTest(x, () -> {
             String inputFile = loadFile("fails/" + x + ".s");
-            InvalidAssemblyException t = assertThrows(InvalidAssemblyException.class, () -> AssemblyCompiler.INSTANCE.compile(inputFile));
+            assertThrows(InvalidAssemblyException.class, () -> AssemblyCompiler.INSTANCE.compile(inputFile));
         }));
     }
 

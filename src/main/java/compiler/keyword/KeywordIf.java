@@ -10,16 +10,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
-import compiler.component.ComponentLabel;
 import compiler.component.Components;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
 import compiler.util.Helpers;
-import compiler.util.InvalidAssemblyException;
-import compiler.util.RegisterExpressions;
+import compiler.util.conditionals.ConditionalExpressions;
+import compiler.util.conditionals.IConditional;
 
 import static compiler.component.IComponent.Flag.FUNCTION_PREFIX;
-import static compiler.component.IComponent.Flag.TYPE;
 
 public class KeywordIf extends AbstractKeyword
 {
@@ -38,32 +36,17 @@ public class KeywordIf extends AbstractKeyword
         IComponent parent = compiler.getComponent(IComponent.Type.CURRENT);
         Stack<IComponent> controlStack = compiler.getControlStack();
 
-        String lhs = getArg(source, COMPARATORS);
-        if (!REGISTERS.contains(lhs))
-        {
-            throw new InvalidAssemblyException("Unable to do an if statement with LHS not a register: " + lhs + source);
-        }
-
-        String op = getOp(source, COMPARATORS);
-        if (op.equals(""))
-        {
-            throw new InvalidAssemblyException("Unknown comparison operator " + source);
-        }
-
-        String rhs = getArg(source, ":");
-        if (!REGISTERS.contains(rhs))
-        {
-            throw new InvalidAssemblyException("Unable to do an if statement with RHS not a register: " + rhs + source);
-        }
-
         // get the counter for this function
         String functionName = parent.getFlag(FUNCTION_PREFIX);
         int value = counter.getOrDefault(functionName, 1);
 
         String label = functionName + "_if" + value;
-        String result = RegisterExpressions.ofCompInverted(lhs, rhs, op, "%s");
-        parent.add(new ComponentLabel(result, label).setFlag(TYPE, "break_conditional"));
-        controlStack.add(Components.label(label));
+        IConditional condition = ConditionalExpressions.create(label, source);
+        condition.build().forEach(parent::add);
+        // Label for the true section
+        parent.add(Components.label(label + "_a_t"));
+        // Stack label for the false section
+        controlStack.add(Components.label(label + "_a_f"));
 
         // Increment the counter in the map
         counter.put(functionName, value + 1);

@@ -97,13 +97,4 @@ public final class RegisterExpressions
         }
         return IComponent.format(COMPARISONS.get(op), String.format("%s, %s, %s\n", rX, rY, label));
     }
-
-    public static String ofCompInverted(String rX, String rY, String op, String label)
-    {
-        if (!COMPARISONS_INVERTED.containsKey(op))
-        {
-            throw new InvalidAssemblyException("Unknown comparison " + op);
-        }
-        return IComponent.format(COMPARISONS_INVERTED.get(op), String.format("%s, %s, %s\n", rX, rY, label));
-    }
 }

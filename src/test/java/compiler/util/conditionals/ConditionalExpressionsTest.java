@@ -184,7 +184,7 @@ class ConditionalExpressionsTest
                 Components.noop(),
                 Components.label("test_a_f")
         );
-        Optimizer.accept(components, "simplify_names");
+        Optimizer.accept(components, "simplify_names", "invert_conditionals");
         assertEquals(exp, Helpers.reduceCollection(components, IComponent::compile));
 
         // Everything should pass this second test, as there are no outside labels, so everything should be optimized away as unused

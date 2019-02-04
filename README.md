@@ -2,6 +2,19 @@
 
 This is a trans-compiler which will generate source code for the Nios-II DE0 processor given input in a custom pseudocode language (referred to hereafter as Reduced Assembly).
 
+
+### Usage:
+
+The compiler has a basic command line syntax:
+```
+java -jar [compile|compilef] [input] [output]
+```
+* `compile`: Use this to compile from an input file to the console
+* `compilef`: Use this to compile from an input file and save to an output file
+* `input`: The input file argument
+* `output`: The output file argument (only for `compilef`)
+
+
 ### Overview
 
 Example 1: Starter Program
@@ -93,6 +106,19 @@ if r3 >= r0:
     // some statements
 end
 ```
+
+Conditionals can also be used with logical operators, using similar syntax to python. The three logical / boolean operators are (unary) `not`, `and` and `or`. These preform the standard boolean AND, OR and NOT operations.
+
+`(` and `)` can be used to group statements. If left out, the conditional is evaluated left to right. Note that there are no special preference rules, i.e. the following:
+```
+if r0 < r1 and not r2 < r4 or r2 < r0:
+```
+will be evaluated as:
+```
+if (r0 < r1) and ( not ( (r2 < r4) or (r2 < r0) )):
+```
+
+All conditionals are constructed using an explicit recursive method, and then optimized at the end of compilation. Labels involved in conditionals will follow the convention `<function prefix>_<if|else|while>number|alphabetic identifier`. These do not indicate particular sections of the conditional when compiled.
 
 ### Variables and Constants
 

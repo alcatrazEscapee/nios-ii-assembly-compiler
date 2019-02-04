@@ -16,15 +16,13 @@ import compiler.component.IComponent;
 public abstract class ConditionalLogical extends AbstractConditional
 {
     final IConditional lhs, rhs;
-    private final String op;
     private final String name;
 
-    ConditionalLogical(String name, IConditional lhs, IConditional rhs, String op)
+    ConditionalLogical(String name, IConditional lhs, IConditional rhs)
     {
         this.name = name;
         this.lhs = lhs;
         this.rhs = rhs;
-        this.op = op;
     }
 
     @Override
@@ -35,9 +33,9 @@ public abstract class ConditionalLogical extends AbstractConditional
 
     public static class Or extends ConditionalLogical
     {
-        Or(String name, IConditional lhs, IConditional rhs, String op)
+        Or(String name, IConditional lhs, IConditional rhs)
         {
-            super(name, lhs, rhs, op);
+            super(name, lhs, rhs);
         }
 
         @Override
@@ -59,9 +57,9 @@ public abstract class ConditionalLogical extends AbstractConditional
 
     public static class And extends ConditionalLogical
     {
-        And(String name, IConditional lhs, IConditional rhs, String op)
+        And(String name, IConditional lhs, IConditional rhs)
         {
-            super(name, lhs, rhs, op);
+            super(name, lhs, rhs);
         }
 
         @Override

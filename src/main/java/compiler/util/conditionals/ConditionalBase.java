@@ -10,14 +10,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import compiler.component.ComponentLabel;
 import compiler.component.Components;
 import compiler.component.IComponent;
 import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
-import compiler.util.RegisterExpressions;
 
-import static compiler.component.IComponent.Flag.TYPE;
 import static compiler.keyword.IKeyword.COMPARATORS;
 import static compiler.keyword.IKeyword.REGISTERS;
 
@@ -30,13 +27,13 @@ public class ConditionalBase extends AbstractConditional
     {
         this.name = name;
 
-        String lhs = Helpers.getFromList(source, REGISTERS);
+        String lhs = Helpers.matchFromList(source, REGISTERS);
         if (!REGISTERS.contains(lhs))
         {
             throw new InvalidAssemblyException("Unable to do an if statement with LHS not a register: " + lhs + source);
         }
 
-        String op = Helpers.getFromList(source, COMPARATORS);
+        String op = Helpers.matchFromList(source, COMPARATORS);
         if (op.equals(""))
         {
             throw new InvalidAssemblyException("Unknown comparison operator " + source);
@@ -50,7 +47,7 @@ public class ConditionalBase extends AbstractConditional
 
         this.components = new ArrayList<>();
         Collections.addAll(components,
-                new ComponentLabel(RegisterExpressions.ofComp(lhs, rhs, op, "%s"), name + "_t").setFlag(TYPE, "break_conditional"),
+                Components.brOp(lhs, op, rhs, name + "_t"),
                 Components.br(name + "_f")
         );
     }

@@ -37,6 +37,19 @@ public class IComponentManagerStub implements IComponent, IComponentManager
     }
 
     @Override
+    public String getFlag(Flag type)
+    {
+        return flags.getOrDefault(type, "");
+    }
+
+    @Override
+    public IComponent setFlag(Flag type, String flag)
+    {
+        flags.put(type, flag);
+        return this;
+    }
+
+    @Override
     public void addComponent(Type type, IComponent component)
     {
         components.add(component);
@@ -64,18 +77,5 @@ public class IComponentManagerStub implements IComponent, IComponentManager
     public void addConstant(String name, String value)
     {
         constants.put(name, value);
-    }
-
-    @Override
-    public String getFlag(Flag type)
-    {
-        return flags.getOrDefault(type, "");
-    }
-
-    @Override
-    public IComponent setFlag(Flag type, String flag)
-    {
-        flags.put(type, flag);
-        return this;
     }
 }

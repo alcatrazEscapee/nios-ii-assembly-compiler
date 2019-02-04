@@ -96,12 +96,12 @@ public final class Helpers
         return c;
     }
 
-    public static String getFromList(StringBuilder source, String... list)
+    public static String matchFromList(StringBuilder source, String... list)
     {
-        return getFromList(source, Arrays.asList(list));
+        return matchFromList(source, Arrays.asList(list));
     }
 
-    public static String getFromList(StringBuilder source, Collection<String> list)
+    public static String matchFromList(StringBuilder source, Collection<String> list)
     {
         for (String s : list)
         {
@@ -112,6 +112,29 @@ public final class Helpers
             }
         }
         return "";
+    }
+
+    public static String matchUntil(StringBuilder source, char... delimiters)
+    {
+        StringBuilder arg = new StringBuilder();
+        while (source.length() > 0 && !arrayContains(source.charAt(0), delimiters))
+        {
+            arg.append(source.charAt(0));
+            source.deleteCharAt(0);
+        }
+        return arg.toString();
+    }
+
+    private static boolean arrayContains(char c, char... array)
+    {
+        for (char c1 : array)
+        {
+            if (c == c1)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static <T> String reduceCollection(Collection<T> items, Function<T, String> mappingFunction)
@@ -134,4 +157,6 @@ public final class Helpers
         }
         return new String(buf);
     }
+
+    private Helpers() {}
 }

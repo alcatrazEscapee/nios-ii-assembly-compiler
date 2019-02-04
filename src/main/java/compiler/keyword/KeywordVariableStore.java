@@ -21,7 +21,7 @@ import compiler.util.InvalidAssemblyException;
  * *rX = (cast) rY      ->      st(w/b)(io/) rY, 0(rX)
  * *rX[OFF] = (cast) rY ->      st(w/b)(io/) rY, OFF(rX)
  */
-public class KeywordVariableStore extends AbstractKeyword
+public class KeywordVariableStore implements IKeyword
 {
     @Override
     public boolean matches(String keyword, StringBuilder inputBuilder)
@@ -34,14 +34,15 @@ public class KeywordVariableStore extends AbstractKeyword
     {
         StringBuilder source = Helpers.nextLine(inputBuilder);
         IComponent parent = compiler.getComponent(IComponent.Type.CURRENT);
-        if (parent == null) {
+        if (parent == null)
+        {
             throw new InvalidAssemblyException("Variable store found outside function");
         }
         boolean byteFlag = false, ioFlag = false;
 
         if (keyword.equals("*"))
         {
-            String lhs = getArg(source, "=", "[");
+            String lhs = Helpers.matchUntil(source, '=', '[');
             if (!REGISTERS.contains(lhs))
             {
                 throw new InvalidAssemblyException("Unable to do variable store with pointer to not a register " + lhs);
@@ -56,14 +57,14 @@ public class KeywordVariableStore extends AbstractKeyword
             {
                 // Delete leading '['
                 source.deleteCharAt(0);
-                offset = getArg(source, "]");
+                offset = Helpers.matchUntil(source, ']');
                 // Delete ending ']'
                 source.deleteCharAt(0);
             }
 
             // Delete '='
             source.deleteCharAt(0);
-            String rhs = getArg(source);
+            String rhs = Helpers.matchUntil(source);
 
             // Casting flags
             if (rhs.length() >= 4 && rhs.startsWith("(io)"))
@@ -93,7 +94,7 @@ public class KeywordVariableStore extends AbstractKeyword
         else
         {
             String varName = keyword.substring(0, keyword.length() - 1).replace(" ", "");
-            String rhs = getArg(source, ALL);
+            String rhs = Helpers.matchUntil(source, DELIMITERS);
 
             // Casting flags
             if (rhs.length() >= 4 && rhs.startsWith("(io)"))

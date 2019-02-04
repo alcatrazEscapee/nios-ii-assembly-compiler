@@ -15,7 +15,7 @@ import compiler.component.IComponentManager;
 import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
 
-public class KeywordFunction extends AbstractKeyword
+public class KeywordFunction implements IKeyword
 {
     private final Map<String, String> functionNames = new HashMap<>();
 

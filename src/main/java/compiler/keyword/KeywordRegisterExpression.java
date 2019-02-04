@@ -7,11 +7,11 @@
 package compiler.keyword;
 
 import compiler.component.ComponentStatic;
+import compiler.component.Components;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
 import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
-import compiler.util.RegisterExpressions;
 
 import static compiler.component.IComponent.Flag.WRITE_REGISTER;
 
@@ -31,9 +31,9 @@ import static compiler.component.IComponent.Flag.WRITE_REGISTER;
  * rX OP= IMM           ->      OPi rX, rX, IMM
  * rX UOP               ->      OPi rX, rX, 1 (for ++ / --)
  *
- * See {@link RegisterExpressions}
+ * See {@link Components}
  */
-public class KeywordRegisterExpression extends AbstractKeyword
+public class KeywordRegisterExpression implements IKeyword
 {
     @Override
     public boolean matches(String keyword, StringBuilder inputBuilder)
@@ -63,13 +63,13 @@ public class KeywordRegisterExpression extends AbstractKeyword
         if (source.charAt(0) == '=')
         {
             source.deleteCharAt(0);
-            String lhs = getArg(source, ALL);
+            String lhs = Helpers.matchUntil(source, DELIMITERS);
 
             if (REGISTERS.contains(lhs))
             {
                 // Cases: rX = rY OP rz / rX = rY OP IMM / rX = rY
-                String op = getOp(source, OPERATORS);
-                String rhs = getArg(source, ALL);
+                String op = Helpers.matchFromList(source, OPERATORS);
+                String rhs = Helpers.matchUntil(source, DELIMITERS);
 
                 if (op.equals(""))
                 {
@@ -80,14 +80,12 @@ public class KeywordRegisterExpression extends AbstractKeyword
                 else if (REGISTERS.contains(rhs))
                 {
                     // Case: rX = rY OP rZ
-                    String result = RegisterExpressions.of(keyword, lhs, op, rhs);
-                    parent.add(new ComponentStatic(result).setFlag(WRITE_REGISTER, keyword));
+                    parent.add(Components.op(keyword, lhs, op, rhs));
                 }
                 else
                 {
                     // Case: rX = rY OP IMM
-                    String result = RegisterExpressions.ofImm(keyword, lhs, op, rhs);
-                    parent.add(new ComponentStatic(result).setFlag(WRITE_REGISTER, keyword));
+                    parent.add(Components.opi(keyword, lhs, op, rhs));
                 }
             }
             else
@@ -115,7 +113,7 @@ public class KeywordRegisterExpression extends AbstractKeyword
                 {
                     // Remove the '&'
                     source.deleteCharAt(0);
-                    String rhs = getArg(source, ALL);
+                    String rhs = Helpers.matchUntil(source, DELIMITERS);
                     if (REGISTERS.contains(rhs))
                     {
                         String offset = "0";
@@ -124,7 +122,7 @@ public class KeywordRegisterExpression extends AbstractKeyword
                         {
                             // Remove leading '['
                             source.deleteCharAt(0);
-                            offset = getArg(source, "]");
+                            offset = Helpers.matchUntil(source, ']');
                             // Remove ending ']'
                             source.deleteCharAt(0);
                         }
@@ -178,13 +176,12 @@ public class KeywordRegisterExpression extends AbstractKeyword
         else if (source.toString().equals("++") || source.toString().equals("--"))
         {
             // Case: rX UOP
-            String result = RegisterExpressions.ofImm(keyword, keyword, String.valueOf(source.charAt(0)), "1");
-            parent.add(new ComponentStatic(result).setFlag(WRITE_REGISTER, keyword));
+            parent.add(Components.opi(keyword, keyword, String.valueOf(source.charAt(0)), "1"));
         }
         else
         {
             // Cases: rX OP= imm / rX OP= rY
-            String op = getOp(source, OPERATORS);
+            String op = Helpers.matchFromList(source, OPERATORS);
             if (source.charAt(0) != '=')
             {
                 throw new InvalidAssemblyException("Unknown operator with assignment " + op + " " + source);
@@ -192,18 +189,16 @@ public class KeywordRegisterExpression extends AbstractKeyword
             // Remove the '='
             source.deleteCharAt(0);
 
-            String rhs = getArg(source, ALL);
+            String rhs = Helpers.matchUntil(source, DELIMITERS);
             if (REGISTERS.contains(rhs))
             {
                 // Case: rX OP= rY
-                String result = RegisterExpressions.of(keyword, keyword, op, rhs);
-                parent.add(new ComponentStatic(result).setFlag(WRITE_REGISTER, keyword));
+                parent.add(Components.op(keyword, keyword, op, rhs));
             }
             else
             {
                 // Case: rX OP= IMM
-                String result = RegisterExpressions.ofImm(keyword, keyword, op, rhs);
-                parent.add(new ComponentStatic(result).setFlag(WRITE_REGISTER, keyword));
+                parent.add(Components.opi(keyword, keyword, op, rhs));
             }
         }
     }

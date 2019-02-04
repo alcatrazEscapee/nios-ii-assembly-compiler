@@ -18,86 +18,10 @@ import static compiler.component.IComponent.Flag.TYPE;
 public final class Optimizer
 {
     private static final String[] ORIGINAL = {"blt", "bgt", "ble", "bge", "bne", "beq"};
-
-    private static final class LabelMap
-    {
-        private final Map<String, Map<Integer, List<String>>> labels = new HashMap<>();
-        private final Set<String> allLabels = new HashSet<>();
-        private final Map<String, String> simplifiedLabels = new HashMap<>();
-        private String functionName = null;
-
-        LabelMap()
-        {
-            labels.put("while", new HashMap<>());
-            labels.put("if", new HashMap<>());
-            labels.put("else", new HashMap<>());
-        }
-
-        void add(String label)
-        {
-            if (allLabels.contains(label))
-            {
-                return;
-            }
-            allLabels.add(label);
-
-            // functionName_loopType##_sub_truthy
-            // Note _sub_truthy might not exist for simple conditionals
-            String[] args = label.split("_");
-            if (functionName == null)
-            {
-                functionName = args[0];
-            }
-
-            Map<Integer, List<String>> map = labels.get(args[1].replaceAll("[0-9]", ""));
-            int count = Integer.valueOf(args[1].replaceAll("[A-Za-z]", ""));
-            if (!map.containsKey(count))
-            {
-                map.put(count, new ArrayList<>());
-            }
-            if (args.length <= 2)
-            {
-                map.get(count).add("");
-            }
-            else
-            {
-                map.get(count).add("_" + args[2] + "_" + args[3]);
-            }
-        }
-
-        void build()
-        {
-            for (Map.Entry<String, Map<Integer, List<String>>> e1 : labels.entrySet())
-            {
-                String loopType = e1.getKey();
-                for (Map.Entry<Integer, List<String>> e2 : e1.getValue().entrySet())
-                {
-                    int count = e2.getKey();
-                    List<String> suffixes = e2.getValue();
-                    suffixes.sort(String.CASE_INSENSITIVE_ORDER);
-
-                    for (int i = 0; i < suffixes.size(); i++)
-                    {
-                        String suffix = i == 0 ? "" : Helpers.alphabetSuffix(i);
-                        String oldLabel = String.format("%s_%s%d%s", functionName, loopType, count, suffixes.get(i));
-                        String newLabel = String.format("%s_%s%d%s", functionName, loopType, count, suffix);
-                        simplifiedLabels.put(oldLabel, newLabel);
-                    }
-                }
-            }
-        }
-
-        String get(String label)
-        {
-            return simplifiedLabels.get(label);
-        }
-    }
-
     private static final String[] INVERTED = {"bge", "ble", "bgt", "blt", "beq", "bne"};
 
     public static void accept(List<IComponent> base, String... ignoreFlags)
     {
-        //if (true) return;
         final List<String> flags = Arrays.asList(ignoreFlags);
         final boolean simplifyNames = !flags.contains("simplify_names");
         final boolean invertConditionals = !flags.contains("invert_conditionals");
@@ -203,6 +127,7 @@ public final class Optimizer
                         // label A
                         // Replace with:
                         // br not X to B
+                        // label A
                         IComponent replacement = invertBreak(first, second.getFlag(LABEL));
                         optimizer = list -> {
                             list.set(index, replacement);
@@ -216,7 +141,7 @@ public final class Optimizer
             // Repeat until no possible optimizations are found
         } while (optimizer != null);
 
-        // Single Time Optimizations
+        // Single Time Optimizations - Label Name Simplification
         if (simplifyNames)
         {
             LabelMap labels = new LabelMap();
@@ -230,7 +155,6 @@ public final class Optimizer
             }
 
             labels.build();
-
 
             for (IComponent cmp : base)
             {
@@ -257,5 +181,81 @@ public final class Optimizer
             }
         }
         return new ComponentLabel(IComponent.format(newBreak, parts[2] + " " + parts[3] + " %s\n"), label).setFlag(TYPE, "break_conditional");
+    }
+
+    private Optimizer() {}
+
+    private static final class LabelMap
+    {
+        private final Map<String, Map<Integer, List<String>>> labels = new HashMap<>();
+        private final Set<String> allLabels = new HashSet<>();
+        private final Map<String, String> simplifiedLabels = new HashMap<>();
+        private String functionName = null;
+
+        LabelMap()
+        {
+            labels.put("while", new HashMap<>());
+            labels.put("if", new HashMap<>());
+            labels.put("else", new HashMap<>());
+        }
+
+        void add(String label)
+        {
+            if (allLabels.contains(label))
+            {
+                return;
+            }
+            allLabels.add(label);
+
+            // functionName_loopType##_sub_truthy
+            // Note _sub_truthy might not exist for simple conditionals
+            String[] args = label.split("_");
+            if (functionName == null)
+            {
+                functionName = args[0];
+            }
+
+            Map<Integer, List<String>> map = labels.get(args[1].replaceAll("[0-9]", ""));
+            int count = Integer.valueOf(args[1].replaceAll("[A-Za-z]", ""));
+            if (!map.containsKey(count))
+            {
+                map.put(count, new ArrayList<>());
+            }
+            if (args.length <= 2)
+            {
+                map.get(count).add("");
+            }
+            else
+            {
+                map.get(count).add("_" + args[2] + "_" + args[3]);
+            }
+        }
+
+        void build()
+        {
+            for (Map.Entry<String, Map<Integer, List<String>>> e1 : labels.entrySet())
+            {
+                String loopType = e1.getKey();
+                for (Map.Entry<Integer, List<String>> e2 : e1.getValue().entrySet())
+                {
+                    int count = e2.getKey();
+                    List<String> suffixes = e2.getValue();
+                    suffixes.sort(String.CASE_INSENSITIVE_ORDER);
+
+                    for (int i = 0; i < suffixes.size(); i++)
+                    {
+                        String suffix = i == 0 ? "" : Helpers.alphabetSuffix(i);
+                        String oldLabel = String.format("%s_%s%d%s", functionName, loopType, count, suffixes.get(i));
+                        String newLabel = String.format("%s_%s%d%s", functionName, loopType, count, suffix);
+                        simplifiedLabels.put(oldLabel, newLabel);
+                    }
+                }
+            }
+        }
+
+        String get(String label)
+        {
+            return simplifiedLabels.get(label);
+        }
     }
 }

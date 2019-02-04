@@ -14,7 +14,7 @@ import java.util.Map;
 public abstract class AbstractComponent implements IComponent
 {
     final List<IComponent> components;
-    final Map<Flag, String> flags;
+    private final Map<Flag, String> flags;
 
     AbstractComponent()
     {

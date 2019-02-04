@@ -11,7 +11,7 @@ import compiler.component.IComponent;
 import compiler.component.IComponentManager;
 import compiler.util.Helpers;
 
-public class KeywordCall extends AbstractKeyword
+public class KeywordCall implements IKeyword
 {
     @Override
     public boolean matches(String keyword, StringBuilder inputBuilder)

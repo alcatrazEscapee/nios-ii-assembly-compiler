@@ -17,7 +17,7 @@ import compiler.component.IComponentManager;
 import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
 
-public class KeywordVariable extends AbstractKeyword
+public class KeywordVariable implements IKeyword
 {
     private static final Set<String> VARIABLE_KEYWORDS = new HashSet<>(Arrays.asList("var", "int", "byte", "string", "const"));
 
@@ -41,7 +41,7 @@ public class KeywordVariable extends AbstractKeyword
         {
             StringBuilder source = Helpers.nextLine(inputBuilder);
             // Variables with defined sizes
-            String varName = getArg(source, "=");
+            String varName = Helpers.matchUntil(source, '=');
             if (source.length() == 0)
             {
                 // Declaration with no assignment
@@ -80,7 +80,7 @@ public class KeywordVariable extends AbstractKeyword
             }
             // Remove open bracket
             source.deleteCharAt(0);
-            String varSize = getArg(source, "]");
+            String varSize = Helpers.matchUntil(source, ']');
 
             if (source.charAt(0) != ']')
             {
@@ -90,7 +90,7 @@ public class KeywordVariable extends AbstractKeyword
             // Remove close bracket
             source.deleteCharAt(0);
 
-            String rhs = getArg(source, ALL);
+            String rhs = Helpers.matchUntil(source, DELIMITERS);
             if (source.length() != 0)
             {
                 throw new InvalidAssemblyException("unexpected token, expecting ';' " + source);
@@ -104,7 +104,7 @@ public class KeywordVariable extends AbstractKeyword
             // need to not ignore spaces!
             StringBuilder source = Helpers.nextLine(inputBuilder, ';', true);
             Helpers.advanceToNextWord(source);
-            String varName = getArg(source, "=", " ");
+            String varName = Helpers.matchUntil(source, ' ', '=');
             Helpers.advanceToNextWord(source);
             if (source.length() == 0)
             {
@@ -123,7 +123,7 @@ public class KeywordVariable extends AbstractKeyword
             }
 
             source.deleteCharAt(0);
-            String varValue = getArg(source, "\"");
+            String varValue = Helpers.matchUntil(source, '\"');
 
             compiler.addComponent(new ComponentVariable(varName + ":\n" +
                     IComponent.format(".asciz", "\"" + varValue + "\"\n"), false));
@@ -131,7 +131,7 @@ public class KeywordVariable extends AbstractKeyword
         else if (keyword.equals("const"))
         {
             StringBuilder source = Helpers.nextLine(inputBuilder);
-            String varName = getArg(source, "=");
+            String varName = Helpers.matchUntil(source, '=');
             if (source.length() == 0 || source.charAt(0) != '=')
             {
                 throw new InvalidAssemblyException("Unexpected token at " + varName + source);

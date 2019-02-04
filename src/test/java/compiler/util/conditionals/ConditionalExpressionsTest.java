@@ -171,13 +171,13 @@ class ConditionalExpressionsTest
 
     private void test(String exp, String test)
     {
-        List<IComponent> components = ConditionalExpressions.create("test", Helpers.nextLine(new StringBuilder(test))).build();
+        List<IComponent> components = new IConditional.Builder("test").build(Helpers.nextLine(new StringBuilder(test))).build();
         assertEquals(exp, Helpers.reduceCollection(components, IComponent::compile));
     }
 
     private void testOptimized(String exp, String test)
     {
-        List<IComponent> components = ConditionalExpressions.create("test", Helpers.nextLine(new StringBuilder(test))).build();
+        List<IComponent> components = new IConditional.Builder("test").build(Helpers.nextLine(new StringBuilder(test))).build();
         Collections.addAll(components,
                 Components.noop(),
                 Components.label("test_a_t"),
@@ -188,7 +188,7 @@ class ConditionalExpressionsTest
         assertEquals(exp, Helpers.reduceCollection(components, IComponent::compile));
 
         // Everything should pass this second test, as there are no outside labels, so everything should be optimized away as unused
-        components = ConditionalExpressions.create("test", Helpers.nextLine(new StringBuilder(test))).build();
+        components = new IConditional.Builder("test").build(Helpers.nextLine(new StringBuilder(test))).build();
         Optimizer.accept(components, "simplify_names");
         assertEquals("", Helpers.reduceCollection(components, IComponent::compile));
     }

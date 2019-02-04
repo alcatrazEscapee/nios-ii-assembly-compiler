@@ -15,14 +15,13 @@ import compiler.component.Components;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
 import compiler.util.Helpers;
-import compiler.util.conditionals.ConditionalExpressions;
 import compiler.util.conditionals.IConditional;
 
 import static compiler.component.IComponent.Flag.*;
 
-public class KeywordWhile extends AbstractKeyword
+public class KeywordWhile implements IKeyword
 {
-    private Map<String, Integer> counter = new HashMap<>();
+    private final Map<String, Integer> counter = new HashMap<>();
 
     @Override
     public boolean matches(String keyword, StringBuilder inputBuilder)
@@ -59,7 +58,7 @@ public class KeywordWhile extends AbstractKeyword
         int value = counter.getOrDefault(functionName, 1);
 
         String label = functionName + "_while" + value;
-        IConditional condition = ConditionalExpressions.create(label, source);
+        IConditional condition = new IConditional.Builder(label).build(source);
         parent.add(Components.label(label + "_a_t"));
         controlStack.add(condition);
 

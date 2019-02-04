@@ -10,17 +10,12 @@ import compiler.util.InvalidAssemblyException;
 
 public class ComponentStatic extends AbstractComponent
 {
-    private String result;
     private final Type type;
+    private String result;
 
     public ComponentStatic(String result)
     {
-        this(result, Type.SUB);
-    }
-
-    public ComponentStatic(String result, Type type)
-    {
-        this.type = type;
+        this.type = Type.SUB;
         this.result = result;
     }
 
@@ -37,6 +32,12 @@ public class ComponentStatic extends AbstractComponent
     }
 
     @Override
+    public void add(IComponent sub)
+    {
+        throw new InvalidAssemblyException("Can't add a sub-statement to a static component");
+    }
+
+    @Override
     public IComponent setFlag(Flag type, String flag)
     {
         // Update label
@@ -49,11 +50,5 @@ public class ComponentStatic extends AbstractComponent
             }
         }
         return super.setFlag(type, flag);
-    }
-
-    @Override
-    public void add(IComponent sub)
-    {
-        throw new InvalidAssemblyException("Can't add a sub-statement to a static component");
     }
 }

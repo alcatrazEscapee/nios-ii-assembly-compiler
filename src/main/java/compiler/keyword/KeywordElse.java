@@ -15,7 +15,7 @@ import compiler.util.InvalidAssemblyException;
 
 import static compiler.component.IComponent.Flag.LABEL;
 
-public class KeywordElse extends AbstractKeyword
+public class KeywordElse implements IKeyword
 {
     @Override
     public boolean matches(String keyword, StringBuilder inputBuilder)

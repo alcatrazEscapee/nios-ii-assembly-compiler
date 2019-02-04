@@ -19,9 +19,6 @@ public enum AssemblyCompiler implements IComponentManager
 {
     INSTANCE;
 
-    public static final String FORMAT_STRING_FIELDS = "\t%-16s%s";
-    public static final int SPACES_PER_TAB = 4;
-
     // These are ordered by priority
     private static final List<IKeyword> KEYWORDS = Arrays.asList(new KeywordCompile(), new KeywordMain(), new KeywordIf(), new KeywordElse(), new KeywordWhile(), new KeywordEnd(), new KeywordCall(), new KeywordFunction(), new KeywordReturn(), new KeywordRegisterExpression(), new KeywordVariable(), new KeywordVariableStore(), new KeywordComment());
 
@@ -116,7 +113,7 @@ public enum AssemblyCompiler implements IComponentManager
 
         outputBuilder.append("\n# End of Assembly Source\n\t.end");
         // Replace tabs with spaces - not optional ;)
-        return outputBuilder.toString().replace("\t", new String(new char[SPACES_PER_TAB]).replace('\0', ' '));
+        return outputBuilder.toString().replace("\t", "    ");
     }
 
     @Override

@@ -31,6 +31,8 @@ import static compiler.component.IComponent.Flag.WRITE_REGISTER;
  * rX OP= IMM           ->      OPi rX, rX, IMM
  * rX UOP               ->      OPi rX, rX, 1 (for ++ / --)
  *
+ * Note that * can be interchanged with & for no particular reason
+ *
  * See {@link Components}
  */
 public class KeywordRegisterExpression implements IKeyword
@@ -109,9 +111,9 @@ public class KeywordRegisterExpression implements IKeyword
 
 
                 // Case: rX = IMM / rX = (cast) &VAR / rX = (cast) &rY
-                if (lhs.length() == 0 && source.charAt(0) == '&')
+                if (lhs.length() == 0 && (source.charAt(0) == '&' || source.charAt(0) == '*'))
                 {
-                    // Remove the '&'
+                    // Remove the '&' o '*'
                     source.deleteCharAt(0);
                     String rhs = Helpers.matchUntil(source, DELIMITERS);
                     if (REGISTERS.contains(rhs))

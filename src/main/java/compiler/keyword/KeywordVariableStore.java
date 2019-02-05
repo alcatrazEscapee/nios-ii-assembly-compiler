@@ -20,13 +20,15 @@ import compiler.util.InvalidAssemblyException;
  * VAR = (cast) rX      ->      st(w/b)(io/) rX, VAR(r0)
  * *rX = (cast) rY      ->      st(w/b)(io/) rY, 0(rX)
  * *rX[OFF] = (cast) rY ->      st(w/b)(io/) rY, OFF(rX)
+ *
+ * Note that * can be interchanged with & for no particular reason
  */
 public class KeywordVariableStore implements IKeyword
 {
     @Override
     public boolean matches(String keyword, StringBuilder inputBuilder)
     {
-        return (keyword.endsWith("=") && !REGISTERS.contains(keyword.substring(0, keyword.length() - 1))) || keyword.equals("*");
+        return (keyword.endsWith("=") && !REGISTERS.contains(keyword.substring(0, keyword.length() - 1))) || keyword.equals("*") || keyword.equals("&");
     }
 
     @Override
@@ -40,7 +42,7 @@ public class KeywordVariableStore implements IKeyword
         }
         boolean byteFlag = false, ioFlag = false;
 
-        if (keyword.equals("*"))
+        if (keyword.equals("*") || keyword.equals("&"))
         {
             String lhs = Helpers.matchUntil(source, '=', '[');
             if (!REGISTERS.contains(lhs))

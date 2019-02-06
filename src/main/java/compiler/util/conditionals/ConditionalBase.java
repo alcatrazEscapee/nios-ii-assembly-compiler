@@ -30,19 +30,19 @@ public class ConditionalBase extends AbstractConditional
         String lhs = Helpers.matchFromList(source, REGISTERS);
         if (!REGISTERS.contains(lhs))
         {
-            throw new InvalidAssemblyException("Unable to do an if statement with LHS not a register: " + lhs + source);
+            throw new InvalidAssemblyException("error.message.unknown_register", lhs);
         }
 
         String op = Helpers.matchFromList(source, COMPARATORS);
         if (op.equals(""))
         {
-            throw new InvalidAssemblyException("Unknown comparison operator " + source);
+            throw new InvalidAssemblyException("error.message.unknown_comparator", op);
         }
 
         String rhs = source.toString();
         if (!REGISTERS.contains(rhs))
         {
-            throw new InvalidAssemblyException("Unable to do an if statement with RHS not a register: " + rhs + source);
+            throw new InvalidAssemblyException("error.message.unknown_register", rhs);
         }
 
         this.components = new ArrayList<>();

@@ -59,6 +59,10 @@ public class ComponentFunction extends AbstractComponent
                     registerWrites.add(flag);
                 }
             }
+            if (!cmp.getFlag(Flag.NEED_RETURN).equals(""))
+            {
+                returnFlag = true;
+            }
             else if (flag.equals("return"))
             {
                 returnFlag = true;

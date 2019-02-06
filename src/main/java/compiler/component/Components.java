@@ -72,11 +72,16 @@ public final class Components
         return new ComponentLabel(IComponent.format("br", "%s\n"), label).setFlag(TYPE, "break");
     }
 
+    public static IComponent call(String label)
+    {
+        return new ComponentStatic(IComponent.format("call", label + "\n")).setFlag(WRITE_REGISTER, "ra");
+    }
+
     public static IComponent brOp(String rX, String op, String rY, String label)
     {
         if (!COMPARISONS.containsKey(op))
         {
-            throw new InvalidAssemblyException("Unknown comparison " + op);
+            throw new InvalidAssemblyException("error.message.unknown_operator", op);
         }
         return new ComponentLabel(IComponent.format(COMPARISONS.get(op), String.format("%s, %s, %s\n", rX, rY, "%s")), label).setFlag(TYPE, "break_conditional");
     }
@@ -90,11 +95,11 @@ public final class Components
     {
         if (!EXPRESSIONS.containsKey(op))
         {
-            throw new InvalidAssemblyException("Unknown operation " + op);
+            throw new InvalidAssemblyException("error.message.unknown_operator", op);
         }
         if (op.equals("?|") || op.equals("?&") || op.equals("?^"))
         {
-            throw new InvalidAssemblyException("'hi' operators can only be used with immediate values");
+            throw new InvalidAssemblyException("error.message.operator_hi_immediate");
         }
         return new ComponentStatic(IComponent.format(EXPRESSIONS.get(op), String.format("%s, %s, %s\n", rX, rY, rZ))).setFlag(WRITE_REGISTER, rX);
     }
@@ -103,11 +108,11 @@ public final class Components
     {
         if (!EXPRESSIONS.containsKey(op))
         {
-            throw new InvalidAssemblyException("Unknown operation " + op);
+            throw new InvalidAssemblyException("error.message.unknown_operator", op);
         }
         if (op.equals("/"))
         {
-            throw new InvalidAssemblyException("Division cannot be done with immediate values");
+            throw new InvalidAssemblyException("error.message.operator_div_immediate");
         }
         return new ComponentStatic(IComponent.format(EXPRESSIONS.get(op) + "i", String.format("%s, %s, %s\n", rX, rY, imm))).setFlag(WRITE_REGISTER, rX);
     }

@@ -3,9 +3,13 @@
  */
 
 plugins {
+    // Basic Plugins for Java and Intellij
     id 'java'
     id 'idea'
     id 'application'
+    
+    // This makes the build task include the implementation dependencies (GSON)
+    id "com.github.johnrengelman.shadow" version "4.0.4"
 }
 
 repositories {
@@ -18,13 +22,15 @@ dependencies {
     // Use JUnit 5.3.1 test framework
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
+
+    // Google GSON
+    implementation 'com.google.code.gson:gson:2.8.5'
 }
 
 // Define the main class for the application
-mainClassName = 'compiler.Main'
+mainClassName = 'compiler.AssemblyInterface'
 
 // Task Configuration
-
 jar {
     // Makes the jar actually run from java -jar
     manifest { attributes('Main-Class': mainClassName) }

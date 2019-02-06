@@ -41,15 +41,14 @@ public class KeywordVariable implements IKeyword
         {
             StringBuilder source = Helpers.nextLine(inputBuilder);
             // Variables with defined sizes
-            String varName = Helpers.matchUntil(source, '=');
+            String varName = Helpers.matchUntil(source, DELIMITERS);
             if (source.length() == 0)
             {
                 // Declaration with no assignment
                 int size = keyword.equals("byte") ? 1 : 4;
                 boolean aligned = size == 4;
 
-                compiler.addComponent(new ComponentVariable(varName + ":\n" +
-                        IComponent.format(".skip", size + "\n"), aligned));
+                compiler.addComponent(new ComponentVariable(varName + ":\n" + IComponent.format(".skip", size + "\n"), aligned));
             }
             else if (source.charAt(0) == '=')
             {
@@ -57,18 +56,16 @@ public class KeywordVariable implements IKeyword
                 String vars = source.toString().replace(",", ", ");
                 if (keyword.equals("byte"))
                 {
-                    compiler.addComponent(new ComponentVariable(varName + ":\n" +
-                            IComponent.format(".byte", vars + "\n"), false));
+                    compiler.addComponent(new ComponentVariable(varName + ":\n" + IComponent.format(".byte", vars + "\n"), false));
                 }
                 else
                 {
-                    compiler.addComponent(new ComponentVariable(varName + ":\n" +
-                            IComponent.format(".word", vars + "\n"), true));
+                    compiler.addComponent(new ComponentVariable(varName + ":\n" + IComponent.format(".word", vars + "\n"), true));
                 }
             }
             else
             {
-                throw new InvalidAssemblyException("Unexpected token " + source.toString());
+                throw new InvalidAssemblyException("error.message.extra_keyword", source);
             }
         }
         else if (keyword.equals("var"))
@@ -76,15 +73,15 @@ public class KeywordVariable implements IKeyword
             StringBuilder source = Helpers.nextLine(inputBuilder);
             if (source.charAt(0) != '[')
             {
-                throw new InvalidAssemblyException("Unexpected token, expecting '[' " + source.toString());
+                throw new InvalidAssemblyException("error.message.expected_keyword", source, "[");
             }
             // Remove open bracket
             source.deleteCharAt(0);
-            String varSize = Helpers.matchUntil(source, ']');
+            String varSize = Helpers.matchUntil(source, DELIMITERS);
 
-            if (source.charAt(0) != ']')
+            if (source.length() == 0 || source.charAt(0) != ']')
             {
-                throw new InvalidAssemblyException("Unexpected token, expecting ']' " + source);
+                throw new InvalidAssemblyException("error.message.expected_keyword", source, "]");
             }
 
             // Remove close bracket
@@ -93,7 +90,7 @@ public class KeywordVariable implements IKeyword
             String rhs = Helpers.matchUntil(source, DELIMITERS);
             if (source.length() != 0)
             {
-                throw new InvalidAssemblyException("unexpected token, expecting ';' " + source);
+                throw new InvalidAssemblyException("error.message.extra_keyword", source);
             }
 
             compiler.addComponent(new ComponentVariable(rhs + ":\n" +
@@ -108,22 +105,27 @@ public class KeywordVariable implements IKeyword
             Helpers.advanceToNextWord(source);
             if (source.length() == 0)
             {
-                throw new InvalidAssemblyException("Can't declare a string type variable without assignment");
+                throw new InvalidAssemblyException("error.message.missing_assignment");
             }
             if (source.charAt(0) != '=')
             {
-                throw new InvalidAssemblyException("Unknown token (expecting '=') at " + source);
+                throw new InvalidAssemblyException("error.message.expected_keyword", source, "=");
             }
 
             source.deleteCharAt(0);
             Helpers.advanceToNextWord(source);
-            if (source.charAt(0) != '\"')
+            if (source.length() == 0 || source.charAt(0) != '\"')
             {
-                throw new InvalidAssemblyException("Unknown token (expecting '\"') at " + source);
+                throw new InvalidAssemblyException("error.message.expected_keyword", source, "\"");
             }
 
             source.deleteCharAt(0);
             String varValue = Helpers.matchUntil(source, '\"');
+
+            if (source.length() == 0 || source.charAt(0) != '\"')
+            {
+                throw new InvalidAssemblyException("error.message.expected_keyword", source, "\"");
+            }
 
             compiler.addComponent(new ComponentVariable(varName + ":\n" +
                     IComponent.format(".asciz", "\"" + varValue + "\"\n"), false));
@@ -134,12 +136,16 @@ public class KeywordVariable implements IKeyword
             String varName = Helpers.matchUntil(source, '=');
             if (source.length() == 0 || source.charAt(0) != '=')
             {
-                throw new InvalidAssemblyException("Unexpected token at " + varName + source);
+                throw new InvalidAssemblyException("error.message.missing_assignment");
             }
             // Remove '='
             source.deleteCharAt(0);
 
             IComponent cmp = compiler.getComponent(IComponent.Type.COMPILE);
+            if (cmp == null)
+            {
+                throw new InvalidAssemblyException("error.message.missing_compile");
+            }
             String result = IComponent.format(".equ", String.format("%s, %s\n", varName, source));
 
             compiler.addConstant(varName, source.toString());

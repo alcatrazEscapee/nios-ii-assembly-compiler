@@ -6,7 +6,7 @@
 
 package compiler.keyword;
 
-import compiler.component.ComponentStatic;
+import compiler.component.Components;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
 import compiler.util.Helpers;
@@ -24,7 +24,7 @@ public class KeywordCall implements IKeyword
     {
         StringBuilder source = Helpers.nextLine(inputBuilder);
         IComponent parent = compiler.getComponent(IComponent.Type.CURRENT);
-        // This needs to signal that it writes to the return address register
-        parent.add(new ComponentStatic(IComponent.format("call", source + "\n")).setFlag(IComponent.Flag.WRITE_REGISTER, "ra"));
+        Helpers.requireNonNull(parent, "error.message.extra_keyword", "call");
+        parent.add(Components.call(source.toString()));
     }
 }

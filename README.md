@@ -220,6 +220,16 @@ Breakdown:
 
 By convention, functions are assumed to take all arguments in r2, r3... and return to r2. Additionally, functions should not modify their arguments (with the exception of r2 if it returns). This is handled automatically by interpreting the contents of the function. It is important to declare functions that have no return value as `void`, otherwise `r2` will not get saved if overwritten.
 
+To call a function, use the `call` keyword followed by the function name, i.e.:
+```
+main:
+    call DoStuff
+end
+
+function DoStuff:
+end
+```
+
 ### Register Expressions
 
 Register Expressions are responsible for most lines of code that can be written. They can operate on one, two or three registers, can read and write from memory, or read constant values.
@@ -239,8 +249,9 @@ Operators:
 
 Register expressions can also use registers as pointers:
 
-* `*rX[OFFSET]`: This indicates to set the value at the memory address `rX` plus an offset. It is used on the left hand side of register expressions. 
-* `&rX[OFFSET]`: This indicates the value at the memory address of `rX`, plus an offset. The square brackets and offset are optional.
+* `*rX[OFFSET]`: This indicates to get/set the value at the memory address `rX` plus an offset. The offset is optional. Note that the characters `*` and `&` are completely interchangeable.
+* If used on the left side of an assignment, it will store a value to a memory location.
+* If used on the right side of an assignment statement, it will load a value from memory.
 
 And finally, when accessing variables or memory locations, it can be useful to specify the type of data by casting.
 
@@ -259,7 +270,7 @@ Similarly for assignment to an io memory location (for example):
 
 ### Code Examples
 
-There are various examples of valid Pseudo-Assembly and the corresponding assembly found in /assets/. Notable examples include:
+There are various examples of valid Pseudo-Assembly and the corresponding assembly found in /src/test/resources/sources/. Notable examples include:
 
 * `test1`: The default program
 * `test3`: Demo of variable declarations

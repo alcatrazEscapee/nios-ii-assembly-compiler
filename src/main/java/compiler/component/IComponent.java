@@ -70,6 +70,7 @@ public interface IComponent
         FUNCTION_NAME,
         FUNCTION_PREFIX,
         LABEL,
-        WRITE_REGISTER
+        WRITE_REGISTER,
+        NEED_RETURN
     }
 }

@@ -6,8 +6,6 @@
 
 package compiler.component;
 
-import compiler.util.InvalidAssemblyException;
-
 public class ComponentStatic extends AbstractComponent
 {
     private final Type type;
@@ -29,26 +27,5 @@ public class ComponentStatic extends AbstractComponent
     public String compile()
     {
         return result;
-    }
-
-    @Override
-    public void add(IComponent sub)
-    {
-        throw new InvalidAssemblyException("Can't add a sub-statement to a static component");
-    }
-
-    @Override
-    public IComponent setFlag(Flag type, String flag)
-    {
-        // Update label
-        if (type == Flag.LABEL)
-        {
-            String oldLabel = getFlag(Flag.LABEL);
-            if (!oldLabel.equals(""))
-            {
-                result = result.replace(getFlag(Flag.LABEL), flag);
-            }
-        }
-        return super.setFlag(type, flag);
     }
 }

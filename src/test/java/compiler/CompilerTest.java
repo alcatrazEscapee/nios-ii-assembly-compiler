@@ -7,18 +7,16 @@
 package compiler;
 
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class CompilerTest
 {
@@ -26,8 +24,8 @@ class CompilerTest
     Stream<DynamicTest> testMatches()
     {
         return IntStream.rangeClosed(1, 24).mapToObj(x -> "test" + x).map(x -> DynamicTest.dynamicTest(x, () -> {
-            String inputFile = loadFile("sources/" + x + ".s");
-            String outputFile = loadFile("results/" + x + ".s");
+            String inputFile = Helpers.loadResource("sources/" + x + ".s");
+            String outputFile = Helpers.loadResource("results/" + x + ".s");
             assertEquals(outputFile, AssemblyCompiler.INSTANCE.compile(inputFile));
         }));
     }
@@ -36,27 +34,8 @@ class CompilerTest
     Stream<DynamicTest> testExceptions()
     {
         return IntStream.rangeClosed(1, 4).mapToObj(x -> "exc" + x).map(x -> DynamicTest.dynamicTest(x, () -> {
-            String inputFile = loadFile("fails/" + x + ".s");
+            String inputFile = Helpers.loadResource("fails/" + x + ".s");
             assertThrows(InvalidAssemblyException.class, () -> AssemblyCompiler.INSTANCE.compile(inputFile));
         }));
-    }
-
-    private String loadFile(String fileName)
-    {
-        InputStream input = CompilerTest.class.getClassLoader().getResourceAsStream(fileName);
-        if (input == null)
-        {
-            fail("Input stream is null");
-            return "";
-        }
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(input)))
-        {
-            return reader.lines().reduce((x, y) -> x + "\n" + y).orElse("");
-        }
-        catch (IOException e)
-        {
-            fail("Unable to load file for testing");
-            return "";
-        }
     }
 }

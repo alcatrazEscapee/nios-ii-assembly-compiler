@@ -6,10 +6,12 @@
 
 package compiler.util;
 
+import compiler.AssemblyInterface;
+
 public class InvalidAssemblyException extends RuntimeException
 {
-    public InvalidAssemblyException(String message)
+    public InvalidAssemblyException(String key, Object... args)
     {
-        super(message);
+        super(AssemblyInterface.getLog().format(key, args));
     }
 }

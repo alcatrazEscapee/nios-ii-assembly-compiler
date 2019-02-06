@@ -6,11 +6,11 @@
 
 package compiler.keyword;
 
+import compiler.AssemblyCompiler;
 import compiler.component.ComponentMain;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
 import compiler.util.Helpers;
-import compiler.util.InvalidAssemblyException;
 
 public class KeywordMain implements IKeyword
 {
@@ -24,12 +24,15 @@ public class KeywordMain implements IKeyword
     public void apply(String keyword, StringBuilder inputBuilder, IComponentManager compiler)
     {
         Helpers.advanceToNextWord(inputBuilder);
-        if (inputBuilder.charAt(0) != ':')
+        if (inputBuilder.length() > 0 && inputBuilder.charAt(0) == ':')
         {
-            throw new InvalidAssemblyException("Expected ':' after main declaration");
+            inputBuilder.deleteCharAt(0);
+        }
+        else
+        {
+            AssemblyCompiler.INSTANCE.warn("error.message.expected_colon_main");
         }
 
-        inputBuilder.deleteCharAt(0);
         compiler.addComponent(IComponent.Type.CURRENT, new ComponentMain());
     }
 }

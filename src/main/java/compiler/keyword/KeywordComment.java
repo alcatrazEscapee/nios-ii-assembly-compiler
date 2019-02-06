@@ -6,6 +6,7 @@
 
 package compiler.keyword;
 
+import compiler.AssemblyCompiler;
 import compiler.component.ComponentStatic;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
@@ -24,9 +25,15 @@ public class KeywordComment implements IKeyword
         IComponent parent = compiler.getComponent(IComponent.Type.CURRENT);
         if (parent != null)
         {
+            // If inside a current function, then add a comment
             parent.add(new ComponentStatic("\t#" + inputBuilder + "\n"));
-            // Clear the rest of the line
-            inputBuilder.delete(0, inputBuilder.length());
         }
+        else
+        {
+            AssemblyCompiler.INSTANCE.warn("error.message.discarded_comment");
+        }
+
+        // Clear the rest of the line
+        inputBuilder.delete(0, inputBuilder.length());
     }
 }

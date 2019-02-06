@@ -8,6 +8,7 @@ package compiler.keyword;
 
 import java.util.Stack;
 
+import compiler.AssemblyCompiler;
 import compiler.component.Components;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
@@ -29,6 +30,7 @@ public class KeywordElse implements IKeyword
         // Optional colon
         if (inputBuilder.length() > 0 && inputBuilder.charAt(0) == ':')
         {
+            AssemblyCompiler.INSTANCE.warn("error.message.extra_colon");
             inputBuilder.deleteCharAt(0);
         }
 
@@ -36,11 +38,11 @@ public class KeywordElse implements IKeyword
         Stack<IComponent> controlStack = compiler.getControlStack();
         if (parent == null)
         {
-            throw new InvalidAssemblyException("Unexpected 'else' outside of a function " + inputBuilder);
+            throw new InvalidAssemblyException("error.message.extra_keyword", "else");
         }
         if (controlStack.isEmpty() || !controlStack.peek().getFlag(LABEL).contains("_if"))
         {
-            throw new InvalidAssemblyException("Unknown element on control stack, expected '_if'");
+            throw new InvalidAssemblyException("error.message.unexpected_control_stack", "_if", controlStack.peek().getFlag(LABEL));
         }
         IComponent componentIf = controlStack.pop();
         String labelIf = componentIf.getFlag(LABEL);

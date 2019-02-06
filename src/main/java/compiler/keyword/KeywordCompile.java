@@ -13,13 +13,10 @@ import compiler.util.InvalidAssemblyException;
 
 public class KeywordCompile implements IKeyword
 {
-    private static final String COMPILE_KEYWORD = "compile";
-    private static final String NIOS_II_DE0 = "nios-ii de0";
-
     @Override
     public boolean matches(String keyword, StringBuilder inputBuilder)
     {
-        return IKeyword.matchKeyword(keyword, inputBuilder, COMPILE_KEYWORD);
+        return IKeyword.matchKeyword(keyword, inputBuilder, "compile");
     }
 
     @Override
@@ -27,14 +24,14 @@ public class KeywordCompile implements IKeyword
     {
         Helpers.advanceToNextWord(inputBuilder);
         // Match the compile flag
-        if (inputBuilder.substring(0, 11).equals(NIOS_II_DE0))
+        if (inputBuilder.substring(0, 11).equals("nios-ii de0"))
         {
             inputBuilder.delete(0, 11);
             compiler.addComponent(new ComponentCompile());
         }
         else
         {
-            throw new InvalidAssemblyException("Invalid compile specification");
+            throw new InvalidAssemblyException("error.message.invalid_compile");
         }
     }
 }

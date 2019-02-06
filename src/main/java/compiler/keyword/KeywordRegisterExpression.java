@@ -10,6 +10,7 @@ import compiler.component.ComponentStatic;
 import compiler.component.Components;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
+import compiler.keyword.parsing.CastResult;
 import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
 
@@ -55,11 +56,10 @@ public class KeywordRegisterExpression implements IKeyword
     {
         IComponent parent = compiler.getComponent(IComponent.Type.CURRENT);
         StringBuilder source = Helpers.nextLine(inputBuilder);
-        boolean byteFlag = false, ioFlag = false;
 
         if (parent == null)
         {
-            throw new InvalidAssemblyException("Register expression found outside function");
+            throw new InvalidAssemblyException("error.message.extra_keyword", keyword);
         }
 
         if (source.charAt(0) == '=')
@@ -93,22 +93,8 @@ public class KeywordRegisterExpression implements IKeyword
             else
             {
                 // Casting flags
-                if (lhs.length() >= 4 && lhs.startsWith("(io)"))
-                {
-                    ioFlag = true;
-                    lhs = lhs.substring(4);
-                }
-                if (lhs.length() >= 6 && lhs.startsWith("(byte)"))
-                {
-                    byteFlag = true;
-                    lhs = lhs.substring(6);
-                }
-                if (lhs.length() >= 8 && lhs.startsWith("(byteio)"))
-                {
-                    byteFlag = ioFlag = true;
-                    lhs = lhs.substring(8);
-                }
-
+                CastResult cast = new CastResult(lhs);
+                lhs = cast.getResult();
 
                 // Case: rX = IMM / rX = (cast) &VAR / rX = (cast) &rY
                 if (lhs.length() == 0 && (source.charAt(0) == '&' || source.charAt(0) == '*'))
@@ -130,7 +116,7 @@ public class KeywordRegisterExpression implements IKeyword
                         }
 
                         // Case rX = (cast) &rY / rX = (cast) &rY[OFF]
-                        String cmd = makeLoad(byteFlag, ioFlag);
+                        String cmd = cast.makeLoad();
                         String result = IComponent.format(cmd, String.format("%s, %s(%s)\n", keyword, offset, rhs));
                         parent.add(new ComponentStatic(result).setFlag(WRITE_REGISTER, keyword));
                     }
@@ -167,7 +153,7 @@ public class KeywordRegisterExpression implements IKeyword
                         if (source.length() == 0)
                         {
                             // Case: rX = (cast) VAR
-                            String cmd = makeLoad(byteFlag, ioFlag);
+                            String cmd = cast.makeLoad();
                             String result = IComponent.format(cmd, keyword + ", " + lhs + "(r0)\n");
                             parent.add(new ComponentStatic(result).setFlag(WRITE_REGISTER, keyword));
                         }
@@ -186,7 +172,7 @@ public class KeywordRegisterExpression implements IKeyword
             String op = Helpers.matchFromList(source, OPERATORS);
             if (source.charAt(0) != '=')
             {
-                throw new InvalidAssemblyException("Unknown operator with assignment " + op + " " + source);
+                throw new InvalidAssemblyException("error.message.unknown_assignment_operator", source);
             }
             // Remove the '='
             source.deleteCharAt(0);
@@ -203,10 +189,5 @@ public class KeywordRegisterExpression implements IKeyword
                 parent.add(Components.opi(keyword, keyword, op, rhs));
             }
         }
-    }
-
-    private String makeLoad(boolean byteFlag, boolean ioFlag)
-    {
-        return "ld" + (byteFlag ? "b" : "w") + (ioFlag ? "io" : "");
     }
 }

@@ -12,8 +12,7 @@ import compiler.component.IComponentManager;
 import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
 
-import static compiler.component.IComponent.Flag.FUNCTION_PREFIX;
-import static compiler.component.IComponent.Flag.WRITE_REGISTER;
+import static compiler.component.IComponent.Flag.*;
 
 public class KeywordReturn implements IKeyword
 {
@@ -30,14 +29,14 @@ public class KeywordReturn implements IKeyword
         IComponent parent = compiler.getComponent(IComponent.Type.CURRENT);
         if (parent == null)
         {
-            throw new InvalidAssemblyException("Unexpected return outside of function");
+            throw new InvalidAssemblyException("error.message.extra_keyword", "return");
         }
         if (source.length() != 0)
         {
             String reg = source.toString();
             if (!REGISTERS.contains(reg))
             {
-                throw new InvalidAssemblyException("Return can only return registers " + reg);
+                throw new InvalidAssemblyException("error.message.unknown_register", reg);
             }
 
             // Add the quick move flag
@@ -48,6 +47,6 @@ public class KeywordReturn implements IKeyword
         // Add a default return
         String functionName = parent.getFlag(FUNCTION_PREFIX);
         String result = IComponent.format("br", functionName + "_ret\n");
-        parent.add(new ComponentStatic(result).setFlag(WRITE_REGISTER, "return"));
+        parent.add(new ComponentStatic(result).setFlag(NEED_RETURN, "return"));
     }
 }

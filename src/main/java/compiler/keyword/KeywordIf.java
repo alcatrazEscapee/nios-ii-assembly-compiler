@@ -35,6 +35,8 @@ public class KeywordIf implements IKeyword
         IComponent parent = compiler.getComponent(IComponent.Type.CURRENT);
         Stack<IComponent> controlStack = compiler.getControlStack();
 
+        Helpers.requireNonNull(parent, "error.message.extra_keyword", "if");
+
         // get the counter for this function
         String functionName = parent.getFlag(FUNCTION_PREFIX);
         int value = counter.getOrDefault(functionName, 1);

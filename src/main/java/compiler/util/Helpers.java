@@ -6,17 +6,18 @@
 
 package compiler.util;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import compiler.AssemblyInterface;
 
 public final class Helpers
 {
@@ -29,8 +30,24 @@ public final class Helpers
         }
         catch (IOException e)
         {
-            System.out.println("Error reading file! " + e);
-            return "";
+            throw new Error("File '" + fileName + "' not found.");
+        }
+    }
+
+    public static String loadResource(String fileName)
+    {
+        InputStream input = Helpers.class.getClassLoader().getResourceAsStream(fileName);
+        if (input == null)
+        {
+            throw new Error("Resource '" + fileName + "' not found.");
+        }
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(input)))
+        {
+            return reader.lines().reduce((x, y) -> x + "\n" + y).orElse("");
+        }
+        catch (IOException e)
+        {
+            throw new Error("Resource '" + fileName + "' not found.");
         }
     }
 
@@ -43,7 +60,7 @@ public final class Helpers
         }
         catch (IOException e)
         {
-            System.out.println("Error saving file!" + e);
+            AssemblyInterface.getLog().log("utils.error.save_file_exception", e);
         }
     }
 
@@ -52,7 +69,6 @@ public final class Helpers
         return Arrays.stream(input
                 .replaceAll("\r\n", "\n") // Standardize Line Endings
                 .replaceAll("\r", "\n")
-                .replaceAll("\\n+", "\n") // Remove Blank Lines
                 .replaceAll("[ \t]+", " ") // Standardize Spacing
                 .split("\n")).map(String::trim).collect(Collectors.toList());
     }
@@ -156,6 +172,52 @@ public final class Helpers
             n /= 26;
         }
         return new String(buf);
+    }
+
+    public static <T> void requireNonNull(T obj, String message, Object... args)
+    {
+        if (obj == null)
+        {
+            throw new InvalidAssemblyException(message, args);
+        }
+    }
+
+    public static String[] getCommandArgs(String line)
+    {
+        boolean string = false;
+        List<String> args = new ArrayList<>();
+        StringBuilder current = new StringBuilder();
+        StringBuilder source = new StringBuilder(line).append(' ');
+        while (source.length() > 0)
+        {
+            char c = source.charAt(0);
+            source.deleteCharAt(0);
+            if (string)
+            {
+                if (c == '\"' || c == '\'')
+                {
+                    string = false;
+                }
+                else
+                {
+                    current.append(c);
+                }
+            }
+            else if (c == '\"' || c == '\'')
+            {
+                string = true;
+            }
+            else if (c == ' ')
+            {
+                args.add(current.toString());
+                current = new StringBuilder();
+            }
+            else
+            {
+                current.append(c);
+            }
+        }
+        return args.toArray(new String[0]);
     }
 
     private Helpers() {}

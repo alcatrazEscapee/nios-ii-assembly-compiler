@@ -9,6 +9,7 @@ package compiler.keyword;
 import compiler.component.ComponentStatic;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
+import compiler.keyword.parsing.CastResult;
 import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
 
@@ -38,20 +39,19 @@ public class KeywordVariableStore implements IKeyword
         IComponent parent = compiler.getComponent(IComponent.Type.CURRENT);
         if (parent == null)
         {
-            throw new InvalidAssemblyException("Variable store found outside function");
+            throw new InvalidAssemblyException("error.message.extra_keyword", keyword);
         }
-        boolean byteFlag = false, ioFlag = false;
 
         if (keyword.equals("*") || keyword.equals("&"))
         {
             String lhs = Helpers.matchUntil(source, '=', '[');
             if (!REGISTERS.contains(lhs))
             {
-                throw new InvalidAssemblyException("Unable to do variable store with pointer to not a register " + lhs);
+                throw new InvalidAssemblyException("error.message.unknown_register", lhs);
             }
             if (source.length() == 0)
             {
-                throw new InvalidAssemblyException("Unable to do variable store without assignment " + lhs + source);
+                throw new InvalidAssemblyException("error.message.missing_assignment");
             }
 
             String offset = "0";
@@ -67,28 +67,14 @@ public class KeywordVariableStore implements IKeyword
             // Delete '='
             source.deleteCharAt(0);
             String rhs = Helpers.matchUntil(source);
+            CastResult cast = new CastResult(rhs);
+            rhs = cast.getResult();
 
-            // Casting flags
-            if (rhs.length() >= 4 && rhs.startsWith("(io)"))
-            {
-                ioFlag = true;
-                rhs = rhs.substring(4);
-            }
-            if (rhs.length() >= 6 && rhs.startsWith("(byte)"))
-            {
-                byteFlag = true;
-                rhs = rhs.substring(6);
-            }
-            if (rhs.length() >= 8 && rhs.startsWith("(byteio)"))
-            {
-                byteFlag = ioFlag = true;
-                rhs = rhs.substring(8);
-            }
             if (!REGISTERS.contains(rhs))
             {
-                throw new InvalidAssemblyException("Unable to do variable store from not a register " + rhs + " " + source);
+                throw new InvalidAssemblyException("error.message.unknown_register", rhs);
             }
-            String cmd = makeStore(byteFlag, ioFlag);
+            String cmd = cast.makeStore();
             String result = IComponent.format(cmd, String.format("%s, %s(%s)\n", rhs, offset, lhs));
             parent.add(new ComponentStatic(result));
 
@@ -97,31 +83,12 @@ public class KeywordVariableStore implements IKeyword
         {
             String varName = keyword.substring(0, keyword.length() - 1).replace(" ", "");
             String rhs = Helpers.matchUntil(source, DELIMITERS);
+            CastResult cast = new CastResult(rhs);
+            rhs = cast.getResult();
 
-            // Casting flags
-            if (rhs.length() >= 4 && rhs.startsWith("(io)"))
-            {
-                ioFlag = true;
-                rhs = rhs.substring(4);
-            }
-            if (rhs.length() >= 6 && rhs.startsWith("(byte)"))
-            {
-                byteFlag = true;
-                rhs = rhs.substring(6);
-            }
-            if (rhs.length() >= 8 && rhs.startsWith("(byteio)"))
-            {
-                byteFlag = ioFlag = true;
-                rhs = rhs.substring(8);
-            }
             // variable = rX
-            String cmd = makeStore(byteFlag, ioFlag);
+            String cmd = cast.makeStore();
             parent.add(new ComponentStatic(IComponent.format(cmd, rhs + ", " + varName + "(r0)\n")));
         }
-    }
-
-    private String makeStore(boolean byteFlag, boolean ioFlag)
-    {
-        return "st" + (byteFlag ? "b" : "w") + (ioFlag ? "io" : "");
     }
 }

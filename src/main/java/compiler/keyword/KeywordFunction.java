@@ -31,12 +31,12 @@ public class KeywordFunction implements IKeyword
         StringBuilder source = Helpers.nextLine(inputBuilder, ':', false);
         if (source.length() == 0)
         {
-            throw new InvalidAssemblyException("Function name must be non empty");
+            throw new InvalidAssemblyException("error.message.blank_function_name");
         }
         String name = source.toString();
         if (functionNames.containsKey(name))
         {
-            throw new InvalidAssemblyException("Can't have multiple functions with the same name");
+            throw new InvalidAssemblyException("error.message.duplicate_function_name", name);
         }
         // Ensure a unique function name -> prefix mapping
         String shortName = name.replaceAll("[a-z0-9]", "").toLowerCase();
@@ -52,7 +52,6 @@ public class KeywordFunction implements IKeyword
         }
         functionNames.put(name, prefix);
         compiler.addComponent(IComponent.Type.CURRENT, new ComponentFunction(name, prefix, keyword.startsWith("void")));
-
     }
 
     @Override

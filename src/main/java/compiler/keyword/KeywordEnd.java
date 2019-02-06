@@ -24,16 +24,10 @@ public class KeywordEnd implements IKeyword
     @Override
     public void apply(String keyword, StringBuilder inputBuilder, IComponentManager compiler)
     {
-        // You can put semicolons at the end of an 'end' if you want to
-        if (inputBuilder.length() > 0 && inputBuilder.charAt(0) == ';')
-        {
-            inputBuilder.deleteCharAt(0);
-        }
-
         IComponent parent = compiler.getComponent(IComponent.Type.CURRENT);
         if (parent == null)
         {
-            throw new InvalidAssemblyException("Unexpected 'end' when parsing " + inputBuilder);
+            throw new InvalidAssemblyException("error.message.extra_keyword", "end");
         }
 
         Stack<IComponent> controlStack = compiler.getControlStack();

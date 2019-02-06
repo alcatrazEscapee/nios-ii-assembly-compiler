@@ -10,14 +10,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
-import compiler.component.ComponentStatic;
 import compiler.component.Components;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
 import compiler.util.Helpers;
+import compiler.util.InvalidAssemblyException;
 import compiler.util.conditionals.IConditional;
 
-import static compiler.component.IComponent.Flag.*;
+import static compiler.component.IComponent.Flag.FUNCTION_PREFIX;
 
 public class KeywordWhile implements IKeyword
 {
@@ -36,6 +36,11 @@ public class KeywordWhile implements IKeyword
         IComponent parent = compiler.getComponent(IComponent.Type.CURRENT);
         Stack<IComponent> controlStack = compiler.getControlStack();
 
+        if (parent == null)
+        {
+            throw new InvalidAssemblyException("error.message.extra_keyword", "while");
+        }
+
         if (source.toString().equals("true"))
         {
             // get the counter for this function
@@ -43,9 +48,8 @@ public class KeywordWhile implements IKeyword
             int value = counter.getOrDefault(functionName, 1);
 
             String label = "_while" + value;
-            String result = IComponent.format("br", label) + "\n";
-            parent.add(new ComponentStatic(label + ":\n").setFlag(LABEL, label).setFlag(TYPE, "label"));
-            controlStack.add(new ComponentStatic(result).setFlag(LABEL, label).setFlag(TYPE, "break"));
+            parent.add(Components.label(label));
+            controlStack.add(Components.br(label));
 
             // Increment the counter in the map
             counter.put(functionName, value + 1);

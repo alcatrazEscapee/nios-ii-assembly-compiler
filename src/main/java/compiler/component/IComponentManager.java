@@ -17,6 +17,12 @@ public interface IComponentManager
 
     void addComponent(IComponent.Type type, IComponent component);
 
+    /**
+     * Gets the component of a certain type.
+     *
+     * @param type One of CURRENT, MAIN, or COMPILE
+     * @return the component for the type specified. Null if it doesn't exist or is an invalid type
+     */
     IComponent getComponent(IComponent.Type type);
 
     Stack<IComponent> getControlStack();

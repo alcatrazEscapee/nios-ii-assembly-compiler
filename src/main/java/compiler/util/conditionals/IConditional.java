@@ -64,7 +64,7 @@ public interface IConditional extends IComponent
             {
                 if (lhs.length() > 0)
                 {
-                    throw new InvalidAssemblyException("Can't use NOT as a logical operator.");
+                    throw new InvalidAssemblyException("error.message.unary_not");
                 }
                 source.delete(0, op.length());
                 return new ConditionalBinary.Not(nextName(), build(trim(source)));
@@ -81,7 +81,7 @@ public interface IConditional extends IComponent
                     return new ConditionalLogical.And(nextName(), build(trim(lhs)), build(trim(source)));
                 }
             }
-            throw new InvalidAssemblyException("Invalid Conditional expression: parsing reached the end without terminating");
+            throw new InvalidAssemblyException("error.message.invalid_conditional");
         }
 
         private String logicalOperator(StringBuilder source)

@@ -16,6 +16,7 @@ public final class AssemblyInterface
 {
     private static final Scanner SCANNER = new Scanner(System.in);
     private static final Logger LOG = new Logger("Assembly Compiler");
+    private static final String VERSION = "1.0";
 
     public static void main(String... args)
     {
@@ -26,14 +27,13 @@ public final class AssemblyInterface
         else
         {
             String input;
-            LOG.log("command.message.init");
+            LOG.log("command.message.init", VERSION);
             LOG.raw(">>> ");
             while (!(input = SCANNER.nextLine()).equals("exit"))
             {
                 executeCommand(Helpers.getCommandArgs(input));
                 LOG.raw(">>> ");
             }
-
         }
     }
 

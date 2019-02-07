@@ -7,7 +7,7 @@ plugins {
     id 'java'
     id 'idea'
     id 'application'
-    
+
     // This makes the build task include the implementation dependencies (GSON)
     id "com.github.johnrengelman.shadow" version "4.0.4"
 }

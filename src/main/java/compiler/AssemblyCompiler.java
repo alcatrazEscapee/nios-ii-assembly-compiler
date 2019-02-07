@@ -47,8 +47,8 @@ public enum AssemblyCompiler implements IComponentManager
         finally
         {
             // Errors at this point have no line associated to them
-            currentLineNumber = -1;
-            currentLine = "n/a";
+            currentLineNumber++;
+            currentLine = "";
         }
         return buildAssembly();
     }
@@ -120,29 +120,19 @@ public enum AssemblyCompiler implements IComponentManager
         declaredConstants.put(name, value);
     }
 
-    public String getLineNumber()
-    {
-        return currentLineNumber == -1 ? "?" : String.valueOf(currentLineNumber);
-    }
-
-    public String getLine()
-    {
-        return currentLine;
-    }
-
     public void fatal(InvalidAssemblyException e)
     {
-        AssemblyInterface.getLog().log("error.level.fatal", e.getMessage(), AssemblyCompiler.INSTANCE.getLineNumber(), AssemblyCompiler.INSTANCE.getLine());
+        AssemblyInterface.getLog().log("error.level.fatal", e.getMessage(), currentLineNumber, currentLine);
     }
 
     public void error(String message, Object... args)
     {
-        AssemblyInterface.getLog().log("error.level.error", AssemblyInterface.getLog().format(message, args), AssemblyCompiler.INSTANCE.getLineNumber(), AssemblyCompiler.INSTANCE.getLine());
+        AssemblyInterface.getLog().log("error.level.error", AssemblyInterface.getLog().format(message, args), currentLineNumber, currentLine);
     }
 
     public void warn(String message, Object... args)
     {
-        AssemblyInterface.getLog().log("error.level.warn", AssemblyInterface.getLog().format(message, args), AssemblyCompiler.INSTANCE.getLineNumber(), AssemblyCompiler.INSTANCE.getLine());
+        AssemblyInterface.getLog().log("error.level.warn", AssemblyInterface.getLog().format(message, args), currentLineNumber, currentLine);
     }
 
     private void reset()

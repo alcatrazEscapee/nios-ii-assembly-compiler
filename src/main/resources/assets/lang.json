@@ -6,7 +6,7 @@
   "command.message.assembly_view": "Compilation Complete:\n\n%s\n",
   "command.message.compile_failed": "Compilation Failed",
   "command.message.help": "Commands:\n\ncompile [input] - loads file [input] and compiles, then outputs to console\ncompilef [input] [output] - loads file [input] and compiles, then saves result to file [output]\nexit - exits this interface\nhelp - opens the help menu\n",
-  "command.message.init": "Ready...",
+  "command.message.init": "Version %s Initialized.",
   "error.level.error": "Error: %s: At line %s: (%s)",
   "error.level.fatal": "FATAL ERROR: %s: At line %s: (%s)",
   "error.level.warn": "Warning: %s: At line %s: (%s)",

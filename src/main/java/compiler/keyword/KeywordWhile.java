@@ -47,7 +47,7 @@ public class KeywordWhile implements IKeyword
             String functionName = parent.getFlag(FUNCTION_PREFIX);
             int value = counter.getOrDefault(functionName, 1);
 
-            String label = "_while" + value;
+            String label = functionName + "_while" + value + "_a_t";
             parent.add(Components.label(label));
             controlStack.add(Components.br(label));
 

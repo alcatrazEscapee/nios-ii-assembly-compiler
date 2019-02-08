@@ -16,7 +16,7 @@ public final class AssemblyInterface
 {
     private static final Scanner SCANNER = new Scanner(System.in);
     private static final Logger LOG = new Logger("Assembly Compiler");
-    private static final String VERSION = "1.0";
+    private static final String VERSION = "1.2";
 
     public static void main(String... args)
     {

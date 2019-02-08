@@ -11,6 +11,7 @@ import compiler.component.Components;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
 import compiler.keyword.parsing.CastResult;
+import compiler.keyword.parsing.IntResult;
 import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
 
@@ -66,6 +67,12 @@ public class KeywordRegisterExpression implements IKeyword
         {
             source.deleteCharAt(0);
             String lhs = Helpers.matchUntil(source, DELIMITERS);
+            if (lhs.length() == 0 && source.charAt(0) == '-')
+            {
+                // Negative number, so match anyway
+                source.deleteCharAt(0);
+                lhs = '-' + Helpers.matchUntil(source, DELIMITERS);
+            }
 
             if (REGISTERS.contains(lhs))
             {
@@ -87,6 +94,12 @@ public class KeywordRegisterExpression implements IKeyword
                 else
                 {
                     // Case: rX = rY OP IMM
+                    if (rhs.length() == 0 && source.charAt(0) == '-')
+                    {
+                        // Negative number, so parse again
+                        source.deleteCharAt(0);
+                        rhs = '-' + Helpers.matchUntil(source, DELIMITERS);
+                    }
                     parent.add(Components.opi(keyword, lhs, op, rhs));
                 }
             }
@@ -129,34 +142,19 @@ public class KeywordRegisterExpression implements IKeyword
                 }
                 else
                 {
-                    try
+                    IntResult intResult = new IntResult(lhs, compiler);
+                    if (intResult.validLiteral())
                     {
-                        // Account for constants
-                        String var = compiler.getConstant(lhs);
-                        if (var.equals(""))
-                        {
-                            var = lhs;
-                        }
-                        // Account for characters (i.e. 'G'), which are immediate, but don't pass Integer#parseInt
-                        if (!(var.startsWith("'") && var.endsWith("'")))
-                        {
-                            //noinspection ResultOfMethodCallIgnored
-                            Integer.decode(var);
-                        }
                         // Case rX = IMM
                         String result = IComponent.format("movi", keyword + ", " + lhs + "\n");
                         parent.add(new ComponentStatic(result).setFlag(WRITE_REGISTER, keyword));
                     }
-                    catch (NumberFormatException e)
+                    else
                     {
-                        // It wasn't an immediate
-                        if (source.length() == 0)
-                        {
-                            // Case: rX = (cast) VAR
-                            String cmd = cast.makeLoad();
-                            String result = IComponent.format(cmd, keyword + ", " + lhs + "(r0)\n");
-                            parent.add(new ComponentStatic(result).setFlag(WRITE_REGISTER, keyword));
-                        }
+                        // Case: rX = (cast) VAR
+                        String cmd = cast.makeLoad();
+                        String result = IComponent.format(cmd, keyword + ", " + lhs + "(r0)\n");
+                        parent.add(new ComponentStatic(result).setFlag(WRITE_REGISTER, keyword));
                     }
                 }
             }
@@ -185,6 +183,12 @@ public class KeywordRegisterExpression implements IKeyword
             }
             else
             {
+                if (rhs.length() == 0 && source.charAt(0) == '-')
+                {
+                    // Negative number, so parse again
+                    source.deleteCharAt(0);
+                    rhs = '-' + Helpers.matchUntil(source, DELIMITERS);
+                }
                 // Case: rX OP= IMM
                 parent.add(Components.opi(keyword, keyword, op, rhs));
             }

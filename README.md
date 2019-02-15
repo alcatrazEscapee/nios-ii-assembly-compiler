@@ -253,13 +253,19 @@ Register expressions can also use registers as pointers:
 * If used on the left side of an assignment, it will store a value to a memory location.
 * If used on the right side of an assignment statement, it will load a value from memory.
 
-And finally, when accessing variables or memory locations, it can be useful to specify the type of data by casting.
+And finally, when accessing variables or memory locations, it can be useful to specify the type of data by casting. Casting can be done with a number of keywords, specified within brackets in a comma separated format. (Order of casts within the brackets is not important.)
+
+Keywords:
+* `byte`, `b`: Byte
+* `input`, `output`, `io`: Input / Output
+* `byteio`: Deprecated. Indicates both I/O and byte. Should use `byte,io` instead.
+* `unsigned`, `u`: Unsigned
 
 Example:
 ```
+r2 = &r3
 r2 = (byte) &r3
-r2 = (io) &r3
-r2 = (byteio) &r3
+r2 = (b, unsigned, io) &r3
 ```
 These three expressions inside parenthesis indicate to take a specific type of load instruction (word, byte, wordio, or byteio). The default is word.
 Similarly for assignment to an io memory location (for example):

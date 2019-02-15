@@ -6,35 +6,54 @@
 
 package compiler.keyword.parsing;
 
+import compiler.util.InvalidAssemblyException;
+
 public final class CastResult
 {
     private final String result;
-    private final boolean ioFlag, byteFlag;
+    private final boolean ioFlag, byteFlag, unsignedFlag;
 
     public CastResult(String input)
     {
-        if (input.length() >= 4 && input.startsWith("(io)"))
+        boolean ioFlag = false, byteFlag = false, unsignedFlag = false;
+        if (input.startsWith("("))
         {
-            ioFlag = true;
-            byteFlag = false;
-            result = input.substring(4);
-        }
-        else if (input.length() >= 6 && input.startsWith("(byte)"))
-        {
-            ioFlag = false;
-            byteFlag = true;
-            result = input.substring(6);
-        }
-        else if (input.length() >= 8 && input.startsWith("(byteio)"))
-        {
-            byteFlag = ioFlag = true;
-            result = input.substring(8);
+            int index = input.indexOf(')');
+            if (index == -1)
+            {
+                throw new InvalidAssemblyException("error.message.expected_keyword", input, ")");
+            }
+            this.result = input.substring(index + 1);
+            String[] flags = input.substring(1, index).split(",");
+            for (String flag : flags)
+            {
+                switch (flag)
+                {
+                    case "u":
+                    case "unsigned":
+                        unsignedFlag = true;
+                        break;
+                    case "io":
+                    case "input":
+                    case "output":
+                        ioFlag = true;
+                        break;
+                    case "byteio": // Here for legacy reasons
+                        ioFlag = true;
+                    case "byte":
+                    case "b":
+                        byteFlag = true;
+                }
+            }
+
         }
         else
         {
-            byteFlag = ioFlag = false;
-            result = input;
+            this.result = input;
         }
+        this.byteFlag = byteFlag;
+        this.ioFlag = ioFlag;
+        this.unsignedFlag = unsignedFlag;
     }
 
     public String getResult()
@@ -44,11 +63,11 @@ public final class CastResult
 
     public String makeStore()
     {
-        return "st" + (byteFlag ? "b" : "w") + (ioFlag ? "io" : "");
+        return "st" + (byteFlag ? "b" : "w") + (unsignedFlag ? "u" : "") + (ioFlag ? "io" : "");
     }
 
     public String makeLoad()
     {
-        return "ld" + (byteFlag ? "b" : "w") + (ioFlag ? "io" : "");
+        return "ld" + (byteFlag ? "b" : "w") + (unsignedFlag ? "u" : "") + (ioFlag ? "io" : "");
     }
 }

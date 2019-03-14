@@ -22,6 +22,7 @@
   "error.message.extra_keyword": "Unexpected keyword '%s'",
   "error.message.extra_semicolon": "Unexpected semicolon at end of line",
   "error.message.invalid_conditional": "Invalid conditional expression",
+  "error.message.invalid_compile": "Invalid or duplicate compile statement(s)",
   "error.message.invalid_var_assignment": "Can't assign directly to a 'var' type variable",
   "error.message.invalid_literal": "Invalid integer literal",
   "error.message.missing_assignment": "Missing assignment statement",

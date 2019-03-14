@@ -33,7 +33,7 @@ class CompilerTest
     @TestFactory
     Stream<DynamicTest> testExceptions()
     {
-        return IntStream.rangeClosed(1, 4).mapToObj(x -> "exc" + x).map(x -> DynamicTest.dynamicTest(x, () -> {
+        return IntStream.rangeClosed(1, 5).mapToObj(x -> "exc" + x).map(x -> DynamicTest.dynamicTest(x, () -> {
             String inputFile = Helpers.loadResource("fails/" + x + ".s");
             assertThrows(InvalidAssemblyException.class, () -> AssemblyCompiler.INSTANCE.compile(inputFile));
         }));

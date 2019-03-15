@@ -12,7 +12,7 @@ import compiler.component.ComponentStatic;
 import compiler.component.ComponentVariable;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
-import compiler.keyword.parsing.IntResult;
+import compiler.util.literal.IntResult;
 import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
 

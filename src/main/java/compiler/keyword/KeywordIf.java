@@ -14,7 +14,7 @@ import compiler.component.Components;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
 import compiler.util.Helpers;
-import compiler.util.conditionals.IConditional;
+import compiler.util.conditional.IConditional;
 
 import static compiler.component.IComponent.Flag.FUNCTION_PREFIX;
 

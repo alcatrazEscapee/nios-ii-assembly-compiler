@@ -36,7 +36,7 @@ class KeywordVariableStoreTest
     @Test
     void apply1()
     {
-        // VAR = (cast) rX
+        // VAR = (literal) rX
         keyword.apply("test=", new StringBuilder(" r2;"), stub);
         assertEquals("    stw             r2, test(r0)\n", stub.compile());
     }
@@ -44,7 +44,7 @@ class KeywordVariableStoreTest
     @Test
     void apply2()
     {
-        // VAR = (cast) rX
+        // VAR = (literal) rX
         keyword.apply("A=", new StringBuilder("(byteio) r2;"), stub);
         assertEquals("    stbio           r2, A(r0)\n", stub.compile());
     }
@@ -52,7 +52,7 @@ class KeywordVariableStoreTest
     @Test
     void apply3()
     {
-        // *rX = (cast) rY
+        // *rX = (literal) rY
         keyword.apply("*", new StringBuilder("r3 = (io) r6"), stub);
         assertEquals("    stwio           r6, 0(r3)\n", stub.compile());
     }
@@ -60,7 +60,7 @@ class KeywordVariableStoreTest
     @Test
     void apply4()
     {
-        // *rX[OFF] = (cast) rY
+        // *rX[OFF] = (literal) rY
         keyword.apply("*", new StringBuilder(" r5[test] = (byte) r2;"), stub);
         assertEquals("    stb             r2, test(r5)\n", stub.compile());
     }

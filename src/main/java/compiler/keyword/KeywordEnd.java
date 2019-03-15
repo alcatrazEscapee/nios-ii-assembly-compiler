@@ -11,7 +11,7 @@ import java.util.Stack;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
 import compiler.util.InvalidAssemblyException;
-import compiler.util.conditionals.IConditional;
+import compiler.util.conditional.IConditional;
 
 public class KeywordEnd implements IKeyword
 {

@@ -9,8 +9,8 @@ package compiler.keyword;
 import compiler.component.Components;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
-import compiler.keyword.parsing.PatternMatchEnd;
-import compiler.keyword.parsing.PatternTrimSpaces;
+import compiler.util.pattern.PatternMatchEnd;
+import compiler.util.pattern.PatternTrimSpaces;
 import compiler.util.Helpers;
 
 public class KeywordCall implements IKeyword

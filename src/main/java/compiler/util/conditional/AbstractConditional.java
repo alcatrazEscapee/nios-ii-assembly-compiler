@@ -4,7 +4,7 @@
  * See the project LICENCE.md for more information
  */
 
-package compiler.util.conditionals;
+package compiler.util.conditional;
 
 import java.util.EnumMap;
 import java.util.Map;

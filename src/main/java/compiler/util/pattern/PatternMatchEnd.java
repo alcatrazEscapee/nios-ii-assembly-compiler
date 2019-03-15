@@ -4,7 +4,7 @@
  * See the project LICENCE.md for more information
  */
 
-package compiler.keyword.parsing;
+package compiler.util.pattern;
 
 import java.util.ArrayList;
 import java.util.Arrays;

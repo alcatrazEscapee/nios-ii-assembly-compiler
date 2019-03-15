@@ -18,7 +18,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import compiler.AssemblyInterface;
-import compiler.keyword.parsing.IPattern;
+import compiler.util.pattern.IPattern;
 
 public final class Helpers
 {

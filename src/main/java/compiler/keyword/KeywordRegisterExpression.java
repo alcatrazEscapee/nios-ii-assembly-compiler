@@ -10,9 +10,14 @@ import compiler.component.ComponentStatic;
 import compiler.component.Components;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
-import compiler.keyword.parsing.*;
 import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
+import compiler.util.literal.CastResult;
+import compiler.util.literal.IntResult;
+import compiler.util.pattern.PatternIgnoreChar;
+import compiler.util.pattern.PatternIgnoreString;
+import compiler.util.pattern.PatternMatchEnd;
+import compiler.util.pattern.PatternTrimSpaces;
 
 import static compiler.component.IComponent.Flag.WRITE_REGISTER;
 
@@ -23,9 +28,9 @@ import static compiler.component.IComponent.Flag.WRITE_REGISTER;
  * rX = rY              ->      mov rX, rY
  * rX = IMM             ->      movi rX, IMM
  * rX = &VAR            ->      movia rX, VAR
- * rX = (cast) VAR      ->      ld(w/b)(io/) rX, VAR(r0)
- * rX = (cast) &rY      ->      ld(w/b)(io/) rX, 0(rY)
- * rX = (cast) &rY[OFF] ->      ld(w/b)(io/) rX, OFF(rY)
+ * rX = (literal) VAR      ->      ld(w/b)(io/) rX, VAR(r0)
+ * rX = (literal) &rY      ->      ld(w/b)(io/) rX, 0(rY)
+ * rX = (literal) &rY[OFF] ->      ld(w/b)(io/) rX, OFF(rY)
  * rX = rY OP rZ        ->      OP rX, rY, rZ
  * rX = rY OP IMM       ->      OPi rX, rY, IMM
  * rX OP= rY            ->      OP rX, rX, rY
@@ -109,7 +114,7 @@ public class KeywordRegisterExpression implements IKeyword
                 CastResult cast = new CastResult(lhs);
                 lhs = cast.getResult();
 
-                // Case: rX = IMM / rX = (cast) &VAR / rX = (cast) &rY
+                // Case: rX = IMM / rX = (literal) &VAR / rX = (literal) &rY
                 if (lhs.length() == 0 && (source.charAt(0) == '&' || source.charAt(0) == '*'))
                 {
                     // Remove the '&' o '*'
@@ -128,7 +133,7 @@ public class KeywordRegisterExpression implements IKeyword
                             source.deleteCharAt(0);
                         }
 
-                        // Case rX = (cast) &rY / rX = (cast) &rY[OFF]
+                        // Case rX = (literal) &rY / rX = (literal) &rY[OFF]
                         String cmd = cast.makeLoad();
                         String result = IComponent.format(cmd, String.format("%s, %s(%s)\n", keyword, offset, rhs));
                         parent.add(new ComponentStatic(result).setFlag(WRITE_REGISTER, keyword));
@@ -151,7 +156,7 @@ public class KeywordRegisterExpression implements IKeyword
                     }
                     else
                     {
-                        // Case: rX = (cast) VAR
+                        // Case: rX = (literal) VAR
                         String cmd = cast.makeLoad();
                         String result = IComponent.format(cmd, keyword + ", " + lhs + "(r0)\n");
                         parent.add(new ComponentStatic(result).setFlag(WRITE_REGISTER, keyword));

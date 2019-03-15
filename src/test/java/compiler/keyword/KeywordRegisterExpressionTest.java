@@ -73,7 +73,7 @@ class KeywordRegisterExpressionTest
     @Test
     void apply5()
     {
-        // rX = (cast) VAR
+        // rX = (literal) VAR
         keyword.apply("r4", new StringBuilder(" = (byte) test;"), stub);
         assertEquals("    ldb             r4, test(r0)\n", stub.compile());
     }
@@ -81,7 +81,7 @@ class KeywordRegisterExpressionTest
     @Test
     void apply6()
     {
-        // rX = (cast) &rY
+        // rX = (literal) &rY
         keyword.apply("r5", new StringBuilder(" = (io) &r6;"), stub);
         assertEquals("    ldwio           r5, 0(r6)\n", stub.compile());
     }
@@ -89,7 +89,7 @@ class KeywordRegisterExpressionTest
     @Test
     void apply7()
     {
-        // rX = (cast) &rY[OFF]
+        // rX = (literal) &rY[OFF]
         keyword.apply("r4", new StringBuilder(" = (byteio) &r5[4];"), stub);
         assertEquals("    ldbio           r4, 4(r5)\n", stub.compile());
     }
@@ -97,7 +97,7 @@ class KeywordRegisterExpressionTest
     @Test
     void apply8()
     {
-        // rX = (cast) &rY[OFF]
+        // rX = (literal) &rY[OFF]
         keyword.apply("r4", new StringBuilder(" = &r6[test];"), stub);
         assertEquals("    ldw             r4, test(r6)\n", stub.compile());
     }

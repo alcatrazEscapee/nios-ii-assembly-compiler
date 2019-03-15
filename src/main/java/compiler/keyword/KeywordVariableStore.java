@@ -9,7 +9,7 @@ package compiler.keyword;
 import compiler.component.ComponentStatic;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
-import compiler.keyword.parsing.CastResult;
+import compiler.util.literal.CastResult;
 import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
 
@@ -18,9 +18,9 @@ import compiler.util.InvalidAssemblyException;
  * This is a special subset of register expressions that don't start with rX.
  * Each command must match one of the following cases:
  *
- * VAR = (cast) rX      ->      st(w/b)(io/) rX, VAR(r0)
- * *rX = (cast) rY      ->      st(w/b)(io/) rY, 0(rX)
- * *rX[OFF] = (cast) rY ->      st(w/b)(io/) rY, OFF(rX)
+ * VAR = (literal) rX      ->      st(w/b)(io/) rX, VAR(r0)
+ * *rX = (literal) rY      ->      st(w/b)(io/) rY, 0(rX)
+ * *rX[OFF] = (literal) rY ->      st(w/b)(io/) rY, OFF(rX)
  *
  * Note that * can be interchanged with & for no particular reason
  */

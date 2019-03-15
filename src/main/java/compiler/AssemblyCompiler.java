@@ -161,7 +161,7 @@ public enum AssemblyCompiler implements IComponentManager
         while (inputBuilder.length() > 0)
         {
             // Pop a character into the keyword buffer
-            keywordBuilder.append(Helpers.nextChar(inputBuilder));
+            Helpers.nextChar(keywordBuilder, inputBuilder);
 
             String keyword = keywordBuilder.toString();
 

@@ -18,6 +18,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import compiler.AssemblyInterface;
+import compiler.keyword.parsing.IPattern;
 
 public final class Helpers
 {
@@ -73,11 +74,19 @@ public final class Helpers
                 .split("\n")).map(String::trim).collect(Collectors.toList());
     }
 
+    /**
+     * @deprecated use {@link Helpers#matchPattern(StringBuilder, IPattern)} instead
+     */
+    @Deprecated
     public static StringBuilder nextLine(StringBuilder source)
     {
         return nextLine(source, ';', false);
     }
 
+    /**
+     * @deprecated use {@link Helpers#matchPattern(StringBuilder, IPattern)} instead
+     */
+    @Deprecated
     public static StringBuilder nextLine(StringBuilder source, char delimiter, boolean useWhitespace)
     {
         StringBuilder word = new StringBuilder();
@@ -97,6 +106,10 @@ public final class Helpers
         return word;
     }
 
+    /**
+     * @deprecated use {@link Helpers#matchPattern(StringBuilder, IPattern)} instead
+     */
+    @Deprecated
     public static void advanceToNextWord(StringBuilder source)
     {
         while (source.length() > 0 && source.charAt(0) == ' ')
@@ -105,18 +118,29 @@ public final class Helpers
         }
     }
 
-    public static char nextChar(StringBuilder source)
+    public static void nextChar(StringBuilder result, StringBuilder source)
     {
         char c = source.charAt(0);
         source.deleteCharAt(0);
-        return c;
+        if (result.length() > 0 || c != ' ')
+        {
+            result.append(c);
+        }
     }
 
+    /**
+     * @deprecated use {@link Helpers#matchPattern(StringBuilder, IPattern)} instead
+     */
+    @Deprecated
     public static String matchFromList(StringBuilder source, String... list)
     {
         return matchFromList(source, Arrays.asList(list));
     }
 
+    /**
+     * @deprecated use {@link Helpers#matchPattern(StringBuilder, IPattern)} instead
+     */
+    @Deprecated
     public static String matchFromList(StringBuilder source, Collection<String> list)
     {
         for (String s : list)
@@ -130,6 +154,10 @@ public final class Helpers
         return "";
     }
 
+    /**
+     * @deprecated use {@link Helpers#matchPattern(StringBuilder, IPattern)} instead
+     */
+    @Deprecated
     public static String matchUntil(StringBuilder source, char... delimiters)
     {
         StringBuilder arg = new StringBuilder();
@@ -139,6 +167,22 @@ public final class Helpers
             source.deleteCharAt(0);
         }
         return arg.toString();
+    }
+
+    public static StringBuilder matchPattern(StringBuilder source, IPattern pattern)
+    {
+        StringBuilder arg = new StringBuilder();
+        pattern.clear();
+        while (source.length() > 0 && !pattern.ends(source.charAt(0)))
+        {
+            char c = source.charAt(0);
+            arg.append(c);
+            pattern.accept(c);
+            source.deleteCharAt(0);
+        }
+        pattern.after(arg);
+        System.out.println("Result after pattern matching: [" + arg + "]");
+        return arg;
     }
 
     private static boolean arrayContains(char c, char... array)

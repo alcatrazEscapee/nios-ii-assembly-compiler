@@ -10,8 +10,7 @@ import compiler.component.ComponentStatic;
 import compiler.component.Components;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
-import compiler.keyword.parsing.CastResult;
-import compiler.keyword.parsing.IntResult;
+import compiler.keyword.parsing.*;
 import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
 
@@ -56,7 +55,7 @@ public class KeywordRegisterExpression implements IKeyword
     public void apply(String keyword, StringBuilder inputBuilder, IComponentManager compiler)
     {
         IComponent parent = compiler.getComponent(IComponent.Type.CURRENT);
-        StringBuilder source = Helpers.nextLine(inputBuilder);
+        StringBuilder source = Helpers.matchPattern(inputBuilder, PatternMatchEnd.END_OF_LINE.and(PatternIgnoreString.SINGLE_QUOTE).and(PatternTrimSpaces.SINGLE_QUOTE_STRINGS));
 
         if (parent == null)
         {
@@ -66,13 +65,14 @@ public class KeywordRegisterExpression implements IKeyword
         if (source.charAt(0) == '=')
         {
             source.deleteCharAt(0);
-            String lhs = Helpers.matchUntil(source, DELIMITERS);
-            if (lhs.length() == 0 && source.charAt(0) == '-')
-            {
-                // Negative number, so match anyway
-                source.deleteCharAt(0);
-                lhs = '-' + Helpers.matchUntil(source, DELIMITERS);
-            }
+            //String lhs = Helpers.matchUntil(source, DELIMITERS);
+            //if (lhs.length() == 0 && source.charAt(0) == '-')
+            //{
+            //    // Negative number, so match anyway
+            //    source.deleteCharAt(0);
+            //    lhs = '-' + Helpers.matchUntil(source, DELIMITERS);
+            //}
+            String lhs = Helpers.matchPattern(source, PatternMatchEnd.DELIMITERS.and(PatternIgnoreChar.IGNORE_MINUS).and(PatternIgnoreString.SINGLE_QUOTE)).toString();
 
             if (REGISTERS.contains(lhs))
             {

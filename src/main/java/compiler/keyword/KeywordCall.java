@@ -9,6 +9,8 @@ package compiler.keyword;
 import compiler.component.Components;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
+import compiler.keyword.parsing.PatternMatchEnd;
+import compiler.keyword.parsing.PatternTrimSpaces;
 import compiler.util.Helpers;
 
 public class KeywordCall implements IKeyword
@@ -22,7 +24,7 @@ public class KeywordCall implements IKeyword
     @Override
     public void apply(String keyword, StringBuilder inputBuilder, IComponentManager compiler)
     {
-        StringBuilder source = Helpers.nextLine(inputBuilder);
+        StringBuilder source = Helpers.matchPattern(inputBuilder, PatternMatchEnd.END_OF_LINE.and(PatternTrimSpaces.ALL));
         IComponent parent = compiler.getComponent(IComponent.Type.CURRENT);
         Helpers.requireNonNull(parent, "error.message.extra_keyword", "call");
         parent.add(Components.call(source.toString()));

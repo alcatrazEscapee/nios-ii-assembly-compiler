@@ -10,18 +10,22 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import compiler.AssemblyInterface;
-import compiler.util.pattern.IPattern;
 
+/**
+ * Generic helper class with useful methods
+ */
 public final class Helpers
 {
+    public static final Set<String> REGISTERS = new HashSet<>(Arrays.asList("r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23", "et", "bt", "gp", "sp", "fp", "ea", "sstatus", "ra", "status", "estatus", "bstatus", "ienable", "ipending"));
+    public static final char[] DELIMITERS = {'<', '>', '?', '+', '-', '*', '/', '=', '&', '|', '^', '[', ']', '!', ':'};
+    public static final String[] OPERATORS = {"?>>", "?<=", "?>=", ">=", "<=", "?<", "?>", "==", "!=", "<<", ">>", "?^", "?|", "?&", "?/", ">", "<", "+", "-", "*", "/", "=", "&", "|", "^"};
+    public static final String[] COMPARATORS = {"?<=", "?>=", "?<", "?>", "<=", ">=", "!=", "==", "<", ">"};
+
     public static String loadFile(String fileName)
     {
         Path filePath = Paths.get(fileName);
@@ -74,50 +78,6 @@ public final class Helpers
                 .split("\n")).map(String::trim).collect(Collectors.toList());
     }
 
-    /**
-     * @deprecated use {@link Helpers#matchPattern(StringBuilder, IPattern)} instead
-     */
-    @Deprecated
-    public static StringBuilder nextLine(StringBuilder source)
-    {
-        return nextLine(source, ';', false);
-    }
-
-    /**
-     * @deprecated use {@link Helpers#matchPattern(StringBuilder, IPattern)} instead
-     */
-    @Deprecated
-    public static StringBuilder nextLine(StringBuilder source, char delimiter, boolean useWhitespace)
-    {
-        StringBuilder word = new StringBuilder();
-        while (source.length() > 0 && source.charAt(0) != delimiter)
-        {
-            if (source.charAt(0) != ' ' || useWhitespace)
-            {
-                word.append(source.charAt(0));
-            }
-            source.deleteCharAt(0);
-        }
-        if (source.length() > 0)
-        {
-            // Remove last delimiter
-            source.deleteCharAt(0);
-        }
-        return word;
-    }
-
-    /**
-     * @deprecated use {@link Helpers#matchPattern(StringBuilder, IPattern)} instead
-     */
-    @Deprecated
-    public static void advanceToNextWord(StringBuilder source)
-    {
-        while (source.length() > 0 && source.charAt(0) == ' ')
-        {
-            source.deleteCharAt(0);
-        }
-    }
-
     public static void nextChar(StringBuilder result, StringBuilder source)
     {
         char c = source.charAt(0);
@@ -126,75 +86,6 @@ public final class Helpers
         {
             result.append(c);
         }
-    }
-
-    /**
-     * @deprecated use {@link Helpers#matchPattern(StringBuilder, IPattern)} instead
-     */
-    @Deprecated
-    public static String matchFromList(StringBuilder source, String... list)
-    {
-        return matchFromList(source, Arrays.asList(list));
-    }
-
-    /**
-     * @deprecated use {@link Helpers#matchPattern(StringBuilder, IPattern)} instead
-     */
-    @Deprecated
-    public static String matchFromList(StringBuilder source, Collection<String> list)
-    {
-        for (String s : list)
-        {
-            if (source.length() >= s.length() && source.substring(0, s.length()).equals(s))
-            {
-                source.delete(0, s.length());
-                return s;
-            }
-        }
-        return "";
-    }
-
-    /**
-     * @deprecated use {@link Helpers#matchPattern(StringBuilder, IPattern)} instead
-     */
-    @Deprecated
-    public static String matchUntil(StringBuilder source, char... delimiters)
-    {
-        StringBuilder arg = new StringBuilder();
-        while (source.length() > 0 && !arrayContains(source.charAt(0), delimiters))
-        {
-            arg.append(source.charAt(0));
-            source.deleteCharAt(0);
-        }
-        return arg.toString();
-    }
-
-    public static StringBuilder matchPattern(StringBuilder source, IPattern pattern)
-    {
-        StringBuilder arg = new StringBuilder();
-        pattern.clear();
-        while (source.length() > 0 && !pattern.ends(source.charAt(0)))
-        {
-            char c = source.charAt(0);
-            arg.append(c);
-            pattern.accept(c);
-            source.deleteCharAt(0);
-        }
-        pattern.after(arg);
-        System.out.println("Result after pattern matching: [" + arg + "]");
-        return arg;
-    }
-
-    private static boolean arrayContains(char c, char... array)
-    {
-        for (char c1 : array)
-        {
-            if (c == c1)
-            {
-                return true;
-            }
-        }
-        return false;
     }
 
     public static <T> String reduceCollection(Collection<T> items, Function<T, String> mappingFunction)
@@ -224,44 +115,6 @@ public final class Helpers
         {
             throw new InvalidAssemblyException(message, args);
         }
-    }
-
-    public static String[] getCommandArgs(String line)
-    {
-        boolean string = false;
-        List<String> args = new ArrayList<>();
-        StringBuilder current = new StringBuilder();
-        StringBuilder source = new StringBuilder(line).append(' ');
-        while (source.length() > 0)
-        {
-            char c = source.charAt(0);
-            source.deleteCharAt(0);
-            if (string)
-            {
-                if (c == '\"' || c == '\'')
-                {
-                    string = false;
-                }
-                else
-                {
-                    current.append(c);
-                }
-            }
-            else if (c == '\"' || c == '\'')
-            {
-                string = true;
-            }
-            else if (c == ' ')
-            {
-                args.add(current.toString());
-                current = new StringBuilder();
-            }
-            else
-            {
-                current.append(c);
-            }
-        }
-        return args.toArray(new String[0]);
     }
 
     private Helpers() {}

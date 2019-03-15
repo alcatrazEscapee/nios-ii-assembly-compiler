@@ -10,7 +10,7 @@ import compiler.AssemblyCompiler;
 import compiler.component.ComponentMain;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
-import compiler.util.Helpers;
+import compiler.util.pattern.Patterns;
 
 public class KeywordMain implements IKeyword
 {
@@ -23,16 +23,11 @@ public class KeywordMain implements IKeyword
     @Override
     public void apply(String keyword, StringBuilder inputBuilder, IComponentManager compiler)
     {
-        Helpers.advanceToNextWord(inputBuilder);
-        if (inputBuilder.length() > 0 && inputBuilder.charAt(0) == ':')
-        {
-            inputBuilder.deleteCharAt(0);
-        }
-        else
+        String source = Patterns.END_OF_LINE.andThen(Patterns.TRIM_SPACE_ALL).apply(inputBuilder).getString();
+        if (!source.equals(":"))
         {
             AssemblyCompiler.INSTANCE.warn("error.message.expected_colon_main");
         }
-
         compiler.addComponent(IComponent.Type.CURRENT, new ComponentMain());
     }
 }

@@ -6,56 +6,19 @@
 
 package compiler.util.pattern;
 
+import compiler.util.literal.PatternResult;
+
+/**
+ * A basic string matching pattern interface.
+ * See {@link PatternResult}
+ */
+@FunctionalInterface
 public interface IPattern
 {
-    IPattern EMPTY = new IPattern() {};
+    PatternResult apply(StringBuilder input);
 
-    default boolean ends(char nextChar) { return true; }
-
-    default void accept(char currentChar) {}
-
-    default void accept(String inputChars)
+    default IPattern andThen(IPattern other)
     {
-        for (char c : inputChars.toCharArray())
-        {
-            accept(c);
-        }
-    }
-
-    default void after(StringBuilder result) {}
-
-    default void clear() {}
-
-    default IPattern and(IPattern other)
-    {
-        return new IPattern()
-        {
-            @Override
-            public boolean ends(char nextChar)
-            {
-                return IPattern.this.ends(nextChar) && other.ends(nextChar);
-            }
-
-            @Override
-            public void accept(char currentChar)
-            {
-                IPattern.this.accept(currentChar);
-                other.accept(currentChar);
-            }
-
-            @Override
-            public void after(StringBuilder result)
-            {
-                IPattern.this.after(result);
-                other.after(result);
-            }
-
-            @Override
-            public void clear()
-            {
-                IPattern.this.clear();
-                other.clear();
-            }
-        };
+        return input -> IPattern.this.apply(input).andThen(other.apply(input));
     }
 }

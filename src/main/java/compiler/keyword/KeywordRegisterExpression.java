@@ -14,10 +14,7 @@ import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
 import compiler.util.literal.CastResult;
 import compiler.util.literal.IntResult;
-import compiler.util.pattern.PatternIgnoreChar;
-import compiler.util.pattern.PatternIgnoreString;
-import compiler.util.pattern.PatternMatchEnd;
-import compiler.util.pattern.PatternTrimSpaces;
+import compiler.util.pattern.Patterns;
 
 import static compiler.component.IComponent.Flag.WRITE_REGISTER;
 
@@ -46,7 +43,7 @@ public class KeywordRegisterExpression implements IKeyword
     @Override
     public boolean matches(String keyword, StringBuilder inputBuilder)
     {
-        for (String reg : REGISTERS)
+        for (String reg : Helpers.REGISTERS)
         {
             if (IKeyword.matchKeyword(keyword, inputBuilder, reg))
             {
@@ -60,7 +57,7 @@ public class KeywordRegisterExpression implements IKeyword
     public void apply(String keyword, StringBuilder inputBuilder, IComponentManager compiler)
     {
         IComponent parent = compiler.getComponent(IComponent.Type.CURRENT);
-        StringBuilder source = Helpers.matchPattern(inputBuilder, PatternMatchEnd.END_OF_LINE.and(PatternIgnoreString.SINGLE_QUOTE).and(PatternTrimSpaces.SINGLE_QUOTE_STRINGS));
+        StringBuilder source = Patterns.END_OF_LINE.andThen(Patterns.IGNORE_SINGLE_QUOTE).andThen(Patterns.TRIM_SPACES_SINGLE_QUOTE).apply(inputBuilder).get();
 
         if (parent == null)
         {
@@ -70,20 +67,13 @@ public class KeywordRegisterExpression implements IKeyword
         if (source.charAt(0) == '=')
         {
             source.deleteCharAt(0);
-            //String lhs = Helpers.matchUntil(source, DELIMITERS);
-            //if (lhs.length() == 0 && source.charAt(0) == '-')
-            //{
-            //    // Negative number, so match anyway
-            //    source.deleteCharAt(0);
-            //    lhs = '-' + Helpers.matchUntil(source, DELIMITERS);
-            //}
-            String lhs = Helpers.matchPattern(source, PatternMatchEnd.DELIMITERS.and(PatternIgnoreChar.IGNORE_MINUS).and(PatternIgnoreString.SINGLE_QUOTE)).toString();
+            String lhs = Patterns.END_DELIMITER.andThen(Patterns.IGNORE_FIRST_MINUS).andThen(Patterns.IGNORE_SINGLE_QUOTE).apply(source).getString();
 
-            if (REGISTERS.contains(lhs))
+            if (Helpers.REGISTERS.contains(lhs))
             {
                 // Cases: rX = rY OP rz / rX = rY OP IMM / rX = rY
-                String op = Helpers.matchFromList(source, OPERATORS);
-                String rhs = Helpers.matchUntil(source, DELIMITERS);
+                String op = Patterns.NEXT_OPERATOR.apply(source).getString();
+                String rhs = Patterns.END_DELIMITER.andThen(Patterns.IGNORE_FIRST_MINUS).apply(source).getString();
 
                 if (op.equals(""))
                 {
@@ -91,7 +81,7 @@ public class KeywordRegisterExpression implements IKeyword
                     String result = IComponent.format("mov", keyword + ", " + lhs + "\n");
                     parent.add(new ComponentStatic(result).setFlag(WRITE_REGISTER, keyword));
                 }
-                else if (REGISTERS.contains(rhs))
+                else if (Helpers.REGISTERS.contains(rhs))
                 {
                     // Case: rX = rY OP rZ
                     parent.add(Components.op(keyword, lhs, op, rhs));
@@ -99,12 +89,6 @@ public class KeywordRegisterExpression implements IKeyword
                 else
                 {
                     // Case: rX = rY OP IMM
-                    if (rhs.length() == 0 && source.charAt(0) == '-')
-                    {
-                        // Negative number, so parse again
-                        source.deleteCharAt(0);
-                        rhs = '-' + Helpers.matchUntil(source, DELIMITERS);
-                    }
                     parent.add(Components.opi(keyword, lhs, op, rhs));
                 }
             }
@@ -117,10 +101,10 @@ public class KeywordRegisterExpression implements IKeyword
                 // Case: rX = IMM / rX = (literal) &VAR / rX = (literal) &rY
                 if (lhs.length() == 0 && (source.charAt(0) == '&' || source.charAt(0) == '*'))
                 {
-                    // Remove the '&' o '*'
+                    // Remove the '&' or '*'
                     source.deleteCharAt(0);
-                    String rhs = Helpers.matchUntil(source, DELIMITERS);
-                    if (REGISTERS.contains(rhs))
+                    String rhs = Patterns.END_DELIMITER.apply(source).getString();
+                    if (Helpers.REGISTERS.contains(rhs))
                     {
                         String offset = "0";
 
@@ -128,7 +112,7 @@ public class KeywordRegisterExpression implements IKeyword
                         {
                             // Remove leading '['
                             source.deleteCharAt(0);
-                            offset = Helpers.matchUntil(source, ']');
+                            offset = Patterns.END_R_BRACKET.apply(source).getString();
                             // Remove ending ']'
                             source.deleteCharAt(0);
                         }
@@ -172,7 +156,7 @@ public class KeywordRegisterExpression implements IKeyword
         else
         {
             // Cases: rX OP= imm / rX OP= rY
-            String op = Helpers.matchFromList(source, OPERATORS);
+            String op = Patterns.NEXT_OPERATOR.apply(source).getString();
             if (source.charAt(0) != '=')
             {
                 throw new InvalidAssemblyException("error.message.unknown_assignment_operator", source);
@@ -180,20 +164,14 @@ public class KeywordRegisterExpression implements IKeyword
             // Remove the '='
             source.deleteCharAt(0);
 
-            String rhs = Helpers.matchUntil(source, DELIMITERS);
-            if (REGISTERS.contains(rhs))
+            String rhs = Patterns.END_DELIMITER.andThen(Patterns.IGNORE_FIRST_MINUS).apply(source).getString();
+            if (Helpers.REGISTERS.contains(rhs))
             {
                 // Case: rX OP= rY
                 parent.add(Components.op(keyword, keyword, op, rhs));
             }
             else
             {
-                if (rhs.length() == 0 && source.charAt(0) == '-')
-                {
-                    // Negative number, so parse again
-                    source.deleteCharAt(0);
-                    rhs = '-' + Helpers.matchUntil(source, DELIMITERS);
-                }
                 // Case: rX OP= IMM
                 parent.add(Components.opi(keyword, keyword, op, rhs));
             }

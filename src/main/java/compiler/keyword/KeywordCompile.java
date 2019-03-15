@@ -8,8 +8,8 @@ package compiler.keyword;
 
 import compiler.component.ComponentCompile;
 import compiler.component.IComponentManager;
-import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
+import compiler.util.pattern.Patterns;
 
 public class KeywordCompile implements IKeyword
 {
@@ -22,11 +22,9 @@ public class KeywordCompile implements IKeyword
     @Override
     public void apply(String keyword, StringBuilder inputBuilder, IComponentManager compiler)
     {
-        Helpers.advanceToNextWord(inputBuilder);
-        // Match the compile flag
-        if (inputBuilder.substring(0, 11).equals("nios-ii de0"))
+        String compileFlag = Patterns.END_OF_LINE.andThen(Patterns.TRIM_SPACE_ALL).apply(inputBuilder).getString();
+        if (compileFlag.equals("nios-iide0"))
         {
-            inputBuilder.delete(0, 11);
             compiler.addComponent(new ComponentCompile());
         }
         else

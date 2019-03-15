@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import compiler.keyword.IKeyword;
+import compiler.util.Helpers;
 import compiler.util.Optimizer;
 
 public class ComponentFunction extends AbstractComponent
@@ -52,7 +52,7 @@ public class ComponentFunction extends AbstractComponent
         for (IComponent cmp : components)
         {
             String flag = cmp.getFlag(Flag.WRITE_REGISTER);
-            if (IKeyword.REGISTERS.contains(flag) && (!flag.equals("r2") || noReturnValue))
+            if (Helpers.REGISTERS.contains(flag) && (!flag.equals("r2") || noReturnValue))
             {
                 if (!registerWrites.contains(flag))
                 {

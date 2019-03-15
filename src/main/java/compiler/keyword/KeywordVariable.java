@@ -12,9 +12,9 @@ import compiler.component.ComponentStatic;
 import compiler.component.ComponentVariable;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
-import compiler.util.literal.IntResult;
-import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
+import compiler.util.literal.IntResult;
+import compiler.util.pattern.Patterns;
 
 /**
  * All variable declarations must match one of hte following forms
@@ -49,16 +49,16 @@ public class KeywordVariable implements IKeyword
         {
             case "int":
             case "byte":
-                applyWord(keyword.equals("byte"), Helpers.nextLine(inputBuilder), compiler);
+                applyWord(keyword.equals("byte"), Patterns.END_OF_LINE.andThen(Patterns.TRIM_SPACE_ALL).apply(inputBuilder).get(), compiler);
                 break;
             case "string":
-                applyString(Helpers.nextLine(inputBuilder, ';', true), compiler);
+                applyString(Patterns.END_OF_LINE.andThen(Patterns.TRIM_SPACES_DOUBLE_QUOTE).andThen(Patterns.IGNORE_DOUBLE_QUOTE).apply(inputBuilder).get(), compiler);
                 break;
             case "var":
-                applyVariable(Helpers.nextLine(inputBuilder), compiler);
+                applyVariable(Patterns.END_OF_LINE.andThen(Patterns.TRIM_SPACE_ALL).apply(inputBuilder).get(), compiler);
                 break;
             case "const":
-                applyConstant(Helpers.nextLine(inputBuilder), compiler);
+                applyConstant(Patterns.END_OF_LINE.andThen(Patterns.TRIM_SPACE_ALL).apply(inputBuilder).get(), compiler);
 
         }
     }
@@ -67,7 +67,7 @@ public class KeywordVariable implements IKeyword
     {
         int size = isByte ? 1 : 4;
         // Variables with defined sizes
-        String varName = Helpers.matchUntil(source, DELIMITERS);
+        String varName = Patterns.END_DELIMITER.apply(source).getString();
         if (source.length() == 0)
         {
             if (varName.equals(""))
@@ -82,7 +82,7 @@ public class KeywordVariable implements IKeyword
         {
             // Remove the first '['
             source.deleteCharAt(0);
-            String arraySize = Helpers.matchUntil(source, ']');
+            String arraySize = Patterns.END_R_BRACKET.apply(source).getString();
             if (source.length() == 0 || source.charAt(0) != ']')
             {
                 throw new InvalidAssemblyException("error.message.expected_keyword", "]");
@@ -96,7 +96,7 @@ public class KeywordVariable implements IKeyword
                 throw new InvalidAssemblyException("error.message.invalid_literal", arraySize);
             }
 
-            varName = Helpers.matchUntil(source, DELIMITERS);
+            varName = Patterns.END_DELIMITER.apply(source).getString();
             if (varName.equals(""))
             {
                 throw new InvalidAssemblyException("error.message.blank_variable_name");
@@ -127,9 +127,7 @@ public class KeywordVariable implements IKeyword
     private void applyString(StringBuilder source, IComponentManager compiler)
     {
         // Case: string name = "VALUE"
-        Helpers.advanceToNextWord(source);
-        String varName = Helpers.matchUntil(source, ' ', '=');
-        Helpers.advanceToNextWord(source);
+        String varName = Patterns.END_DELIMITER.apply(source).getString();
         if (source.length() == 0)
         {
             throw new InvalidAssemblyException("error.message.missing_assignment");
@@ -140,20 +138,12 @@ public class KeywordVariable implements IKeyword
         }
 
         source.deleteCharAt(0);
-        Helpers.advanceToNextWord(source);
         if (source.length() == 0 || source.charAt(0) != '\"')
         {
             throw new InvalidAssemblyException("error.message.expected_keyword", source, "\"");
         }
 
-        source.deleteCharAt(0);
-        String varValue = Helpers.matchUntil(source, '\"');
-
-        if (source.length() == 0 || source.charAt(0) != '\"')
-        {
-            throw new InvalidAssemblyException("error.message.expected_keyword", source, "\"");
-        }
-
+        String varValue = Patterns.END_OF_LINE.andThen(Patterns.IGNORE_DOUBLE_QUOTE).andThen(Patterns.TRIM_DOUBLE_QUOTE).apply(source).getString();
         compiler.addComponent(new ComponentVariable(varName + ":\n" +
                 IComponent.format(".asciz", "\"" + varValue + "\"\n"), false));
     }
@@ -167,7 +157,7 @@ public class KeywordVariable implements IKeyword
         }
         // Remove open bracket
         source.deleteCharAt(0);
-        String varSize = Helpers.matchUntil(source, DELIMITERS);
+        String varSize = Patterns.END_DELIMITER.apply(source).getString();
 
         if (source.length() == 0 || source.charAt(0) != ']')
         {
@@ -177,7 +167,7 @@ public class KeywordVariable implements IKeyword
         // Remove close bracket
         source.deleteCharAt(0);
 
-        String rhs = Helpers.matchUntil(source, DELIMITERS);
+        String rhs = Patterns.END_DELIMITER.apply(source).getString();
         if (source.length() != 0)
         {
             throw new InvalidAssemblyException("error.message.extra_keyword", source);
@@ -190,7 +180,7 @@ public class KeywordVariable implements IKeyword
     private void applyConstant(StringBuilder source, IComponentManager compiler)
     {
         // Case: const name = VALUE
-        String varName = Helpers.matchUntil(source, '=');
+        String varName = Patterns.END_DELIMITER.apply(source).getString();
         if (source.length() == 0 || source.charAt(0) != '=')
         {
             throw new InvalidAssemblyException("error.message.missing_assignment");

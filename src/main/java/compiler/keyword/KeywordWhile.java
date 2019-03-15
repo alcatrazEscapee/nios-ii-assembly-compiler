@@ -13,9 +13,9 @@ import java.util.Stack;
 import compiler.component.Components;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
-import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
 import compiler.util.conditional.IConditional;
+import compiler.util.pattern.Patterns;
 
 import static compiler.component.IComponent.Flag.FUNCTION_PREFIX;
 
@@ -32,7 +32,7 @@ public class KeywordWhile implements IKeyword
     @Override
     public void apply(String keyword, StringBuilder inputBuilder, IComponentManager compiler)
     {
-        StringBuilder source = Helpers.nextLine(inputBuilder, ':', false);
+        StringBuilder source = Patterns.END_COLON.andThen(Patterns.TRIM_SPACE_ALL).apply(inputBuilder).get();
         IComponent parent = compiler.getComponent(IComponent.Type.CURRENT);
         Stack<IComponent> controlStack = compiler.getControlStack();
 

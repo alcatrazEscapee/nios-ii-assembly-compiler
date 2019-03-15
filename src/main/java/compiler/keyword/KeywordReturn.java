@@ -11,6 +11,7 @@ import compiler.component.IComponent;
 import compiler.component.IComponentManager;
 import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
+import compiler.util.pattern.Patterns;
 
 import static compiler.component.IComponent.Flag.*;
 
@@ -25,7 +26,7 @@ public class KeywordReturn implements IKeyword
     @Override
     public void apply(String keyword, StringBuilder inputBuilder, IComponentManager compiler)
     {
-        StringBuilder source = Helpers.nextLine(inputBuilder);
+        StringBuilder source = Patterns.END_OF_LINE.andThen(Patterns.TRIM_SPACE_ALL).apply(inputBuilder).get();
         IComponent parent = compiler.getComponent(IComponent.Type.CURRENT);
         if (parent == null)
         {
@@ -34,7 +35,7 @@ public class KeywordReturn implements IKeyword
         if (source.length() != 0)
         {
             String reg = source.toString();
-            if (!REGISTERS.contains(reg))
+            if (!Helpers.REGISTERS.contains(reg))
             {
                 throw new InvalidAssemblyException("error.message.unknown_register", reg);
             }

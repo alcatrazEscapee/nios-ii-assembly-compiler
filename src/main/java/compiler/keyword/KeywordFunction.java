@@ -12,8 +12,8 @@ import java.util.Map;
 import compiler.component.ComponentFunction;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
-import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
+import compiler.util.pattern.Patterns;
 
 public class KeywordFunction implements IKeyword
 {
@@ -28,7 +28,7 @@ public class KeywordFunction implements IKeyword
     @Override
     public void apply(String keyword, StringBuilder inputBuilder, IComponentManager compiler)
     {
-        StringBuilder source = Helpers.nextLine(inputBuilder, ':', false);
+        StringBuilder source = Patterns.END_DELIMITER.andThen(Patterns.TRIM_SPACE_ALL).apply(inputBuilder).get();
         if (source.length() == 0)
         {
             throw new InvalidAssemblyException("error.message.blank_function_name");

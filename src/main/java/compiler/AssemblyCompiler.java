@@ -180,7 +180,6 @@ public enum AssemblyCompiler implements IComponentManager
 
                     // Reset keyword and input
                     keywordBuilder = new StringBuilder();
-                    Helpers.advanceToNextWord(inputBuilder);
                 }
             }
         }

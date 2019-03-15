@@ -6,15 +6,19 @@
 
 package compiler;
 
+import java.util.Arrays;
 import java.util.Scanner;
 
 import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
 import compiler.util.Logger;
+import compiler.util.pattern.IPattern;
+import compiler.util.pattern.Patterns;
 
 public final class AssemblyInterface
 {
     private static final Scanner SCANNER = new Scanner(System.in);
+    private static final IPattern PATTERN = Patterns.END_SPACE.andThen(Patterns.TRIM_SPACES_DOUBLE_QUOTE).andThen(Patterns.IGNORE_DOUBLE_QUOTE).andThen(Patterns.TRIM_DOUBLE_QUOTE);
     private static final Logger LOG = new Logger("Assembly Compiler");
     private static final String VERSION = "1.4";
 
@@ -22,7 +26,7 @@ public final class AssemblyInterface
     {
         if (args.length > 0)
         {
-            executeCommand(args);
+            executeCommand(Helpers.reduceCollection(Arrays.asList(args), x -> x + " "));
         }
         else
         {
@@ -31,7 +35,7 @@ public final class AssemblyInterface
             LOG.raw(">>> ");
             while (!(input = SCANNER.nextLine()).equals("exit"))
             {
-                executeCommand(Helpers.getCommandArgs(input));
+                executeCommand(input);
                 LOG.raw(">>> ");
             }
         }
@@ -42,47 +46,54 @@ public final class AssemblyInterface
         return LOG;
     }
 
-    private static void executeCommand(String[] args)
+    private static void executeCommand(String input)
     {
-        if (args.length == 0)
+        StringBuilder source = new StringBuilder(input);
+        String commandID = PATTERN.apply(source).getString();
+        if (source.length() == 0)
         {
             LOG.log("command.error.no_arguments");
+            return;
         }
-        switch (args[0])
+        source.deleteCharAt(0);
+        switch (commandID)
         {
             case "compile":
             case "compilef":
-                executeCompile(args);
+                executeCompile(commandID, source);
                 break;
             case "help":
                 LOG.log("command.message.help");
                 break;
             default:
-                LOG.log("command.error.unknown_command", args[0]);
+                LOG.log("command.error.unknown_command", commandID);
         }
     }
 
-    private static void executeCompile(String[] args)
+    private static void executeCompile(String commandArg, StringBuilder source)
     {
-        if (args.length < 2)
+        String arg1 = PATTERN.apply(source).getString();
+        if ("".equals(arg1))
         {
             LOG.log("command.error.missing_argument", "input");
             return;
         }
-        if (args.length < 3 && args[0].equals("compilef"))
+        source.deleteCharAt(0);
+        String arg2 = PATTERN.apply(source).getString();
+        if ("".equals(arg2) && commandArg.equals("compilef"))
         {
             LOG.log("command.error.missing_argument", "output");
             return;
         }
         try
         {
-            String input = Helpers.loadFile(args[1]);
+            String input = Helpers.loadFile(arg1);
             String output = AssemblyCompiler.INSTANCE.compile(input);
 
-            if (args[0].equals("compilef"))
+            if (commandArg.equals("compilef"))
             {
-                Helpers.saveFile(args[2], output);
-                LOG.log("command.message.assembly_saved", args[2]);
+                Helpers.saveFile(arg2, output);
+                LOG.log("command.message.assembly_saved", arg2);
             }
             else
             {

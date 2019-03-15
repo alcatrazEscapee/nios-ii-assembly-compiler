@@ -12,11 +12,10 @@ import java.util.List;
 
 import compiler.component.Components;
 import compiler.component.IComponent;
-import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
+import compiler.util.pattern.Patterns;
 
-import static compiler.keyword.IKeyword.COMPARATORS;
-import static compiler.keyword.IKeyword.REGISTERS;
+import static compiler.util.Helpers.REGISTERS;
 
 public class ConditionalBase extends AbstractConditional
 {
@@ -27,13 +26,13 @@ public class ConditionalBase extends AbstractConditional
     {
         this.name = name;
 
-        String lhs = Helpers.matchFromList(source, REGISTERS);
+        String lhs = Patterns.NEXT_REGISTER.apply(source).getString();
         if (!REGISTERS.contains(lhs))
         {
             throw new InvalidAssemblyException("error.message.unknown_register", lhs);
         }
 
-        String op = Helpers.matchFromList(source, COMPARATORS);
+        String op = Patterns.NEXT_COMPARATOR.apply(source).getString();
         if (op.equals(""))
         {
             throw new InvalidAssemblyException("error.message.unknown_comparator", op);

@@ -9,9 +9,10 @@ package compiler.keyword;
 import compiler.component.ComponentStatic;
 import compiler.component.IComponent;
 import compiler.component.IComponentManager;
-import compiler.util.literal.CastResult;
 import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
+import compiler.util.literal.CastResult;
+import compiler.util.pattern.Patterns;
 
 /**
  * This class is responsible for variable store commands.
@@ -29,13 +30,13 @@ public class KeywordVariableStore implements IKeyword
     @Override
     public boolean matches(String keyword, StringBuilder inputBuilder)
     {
-        return (keyword.endsWith("=") && !REGISTERS.contains(keyword.substring(0, keyword.length() - 1))) || keyword.equals("*") || keyword.equals("&");
+        return (keyword.endsWith("=") && !Helpers.REGISTERS.contains(keyword.substring(0, keyword.length() - 1))) || keyword.equals("*") || keyword.equals("&");
     }
 
     @Override
     public void apply(String keyword, StringBuilder inputBuilder, IComponentManager compiler)
     {
-        StringBuilder source = Helpers.nextLine(inputBuilder);
+        StringBuilder source = Patterns.END_OF_LINE.andThen(Patterns.TRIM_SPACE_ALL).apply(inputBuilder).get();
         IComponent parent = compiler.getComponent(IComponent.Type.CURRENT);
         if (parent == null)
         {
@@ -44,8 +45,8 @@ public class KeywordVariableStore implements IKeyword
 
         if (keyword.equals("*") || keyword.equals("&"))
         {
-            String lhs = Helpers.matchUntil(source, '=', '[');
-            if (!REGISTERS.contains(lhs))
+            String lhs = Patterns.END_DELIMITER.apply(source).getString();
+            if (!Helpers.REGISTERS.contains(lhs))
             {
                 throw new InvalidAssemblyException("error.message.unknown_register", lhs);
             }
@@ -59,18 +60,18 @@ public class KeywordVariableStore implements IKeyword
             {
                 // Delete leading '['
                 source.deleteCharAt(0);
-                offset = Helpers.matchUntil(source, ']');
+                offset = Patterns.END_R_BRACKET.apply(source).getString();
                 // Delete ending ']'
                 source.deleteCharAt(0);
             }
 
             // Delete '='
             source.deleteCharAt(0);
-            String rhs = Helpers.matchUntil(source);
+            String rhs = source.toString();
             CastResult cast = new CastResult(rhs);
             rhs = cast.getResult();
 
-            if (!REGISTERS.contains(rhs))
+            if (!Helpers.REGISTERS.contains(rhs))
             {
                 throw new InvalidAssemblyException("error.message.unknown_register", rhs);
             }
@@ -82,7 +83,7 @@ public class KeywordVariableStore implements IKeyword
         else
         {
             String varName = keyword.substring(0, keyword.length() - 1).replace(" ", "");
-            String rhs = Helpers.matchUntil(source, DELIMITERS);
+            String rhs = Patterns.END_DELIMITER.apply(source).getString();
             CastResult cast = new CastResult(rhs);
             rhs = cast.getResult();
 

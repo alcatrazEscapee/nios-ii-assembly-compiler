@@ -17,7 +17,7 @@ public final class Patterns
     public static final IPattern END_DELIMITER = new MatchEnd(Helpers.DELIMITERS);
     public static final IPattern END_SPACE = new MatchEnd(" ");
     public static final IPattern END_R_BRACKET = new MatchEnd("]");
-    public static final IPattern END_COLON = new MatchEnd(":");
+    public static final IPattern END_COLON = new MatchEnd(false, ":");
 
     public static final IPattern NEXT_REGISTER = new MatchExact(Helpers.REGISTERS);
     public static final IPattern NEXT_OPERATOR = new MatchExact(Helpers.OPERATORS);

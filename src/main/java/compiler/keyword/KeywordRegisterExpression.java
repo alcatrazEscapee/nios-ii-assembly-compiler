@@ -142,6 +142,10 @@ public class KeywordRegisterExpression implements IKeyword
                     {
                         // Case: rX = (literal) VAR
                         String cmd = cast.makeLoad();
+                        if (!Helpers.isValidName(lhs))
+                        {
+                            throw new InvalidAssemblyException("error.message.invalid_variable_name", lhs);
+                        }
                         String result = IComponent.format(cmd, keyword + ", " + lhs + "(r0)\n");
                         parent.add(new ComponentStatic(result).setFlag(WRITE_REGISTER, keyword));
                     }
@@ -152,6 +156,7 @@ public class KeywordRegisterExpression implements IKeyword
         {
             // Case: rX UOP
             parent.add(Components.opi(keyword, keyword, String.valueOf(source.charAt(0)), "1"));
+            source.delete(0, 2);
         }
         else
         {
@@ -176,5 +181,8 @@ public class KeywordRegisterExpression implements IKeyword
                 parent.add(Components.opi(keyword, keyword, op, rhs));
             }
         }
+
+        //System.out.println("Reached the end with + " + source);
+        if (source.length() > 0) throw new InvalidAssemblyException("HAHAHAHAH");
     }
 }

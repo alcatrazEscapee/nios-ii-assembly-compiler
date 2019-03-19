@@ -10,6 +10,7 @@ import java.util.*;
 
 import compiler.component.*;
 import compiler.keyword.*;
+import compiler.util.CompileFlag;
 import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
 
@@ -30,10 +31,21 @@ public enum AssemblyCompiler implements IComponentManager
     private IComponent componentCurrent;
     private String currentLine;
     private int currentLineNumber;
+    private boolean debug;
 
     public String compile(String input)
     {
+        return compile(input, Collections.emptySet());
+    }
+
+    public String compile(String input, Set<CompileFlag> flags)
+    {
+        // Reset compiler
         reset();
+
+        // Set flags
+        debug = flags.contains(CompileFlag.DEBUG_MODE);
+
         try
         {
             List<String> inputLines = Helpers.getLinesUnformatted(input);
@@ -43,6 +55,12 @@ public enum AssemblyCompiler implements IComponentManager
         {
             fatal(e);
             throw e;
+        }
+        catch (Exception e)
+        {
+            InvalidAssemblyException wrapper = new InvalidAssemblyException(e, "error.message.unknown_exception");
+            fatal(wrapper);
+            throw wrapper;
         }
         finally
         {
@@ -123,6 +141,10 @@ public enum AssemblyCompiler implements IComponentManager
     public void fatal(InvalidAssemblyException e)
     {
         AssemblyInterface.getLog().log("error.level.fatal", e.getMessage(), currentLineNumber, currentLine);
+        if (debug)
+        {
+            e.printStackTrace();
+        }
     }
 
     public void error(String message, Object... args)

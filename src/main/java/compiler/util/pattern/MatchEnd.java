@@ -15,15 +15,23 @@ import compiler.util.literal.PatternResult;
 public class MatchEnd implements IPattern
 {
     private final List<String> endSequences;
+    private final boolean replaceEndSequence;
 
     MatchEnd(char... endSequences)
     {
+        this.replaceEndSequence = true;
         this.endSequences = new ArrayList<>();
         for (char c : endSequences) this.endSequences.add(String.valueOf(c));
     }
 
     MatchEnd(String... endSequences)
     {
+        this(true, endSequences);
+    }
+
+    MatchEnd(boolean replaceEndSequence, String... endSequences)
+    {
+        this.replaceEndSequence = replaceEndSequence;
         this.endSequences = Arrays.asList(endSequences);
     }
 
@@ -56,7 +64,10 @@ public class MatchEnd implements IPattern
             {
                 if (t.endsWith(s))
                 {
-                    input.insert(0, s);
+                    if (replaceEndSequence)
+                    {
+                        input.insert(0, s);
+                    }
                     token.delete(token.length() - s.length(), token.length());
                     return;
                 }

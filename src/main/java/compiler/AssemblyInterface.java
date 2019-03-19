@@ -7,8 +7,11 @@
 package compiler;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Scanner;
+import java.util.Set;
 
+import compiler.util.CompileFlag;
 import compiler.util.Helpers;
 import compiler.util.InvalidAssemblyException;
 import compiler.util.Logger;
@@ -20,7 +23,7 @@ public final class AssemblyInterface
     private static final Scanner SCANNER = new Scanner(System.in);
     private static final IPattern PATTERN = Patterns.END_SPACE.andThen(Patterns.TRIM_SPACES_DOUBLE_QUOTE).andThen(Patterns.IGNORE_DOUBLE_QUOTE).andThen(Patterns.TRIM_DOUBLE_QUOTE);
     private static final Logger LOG = new Logger("Assembly Compiler");
-    private static final String VERSION = "1.4";
+    private static final String VERSION = "1.5";
 
     public static void main(String... args)
     {
@@ -72,23 +75,45 @@ public final class AssemblyInterface
 
     private static void executeCompile(String commandArg, StringBuilder source)
     {
-        String arg1 = PATTERN.apply(source).getString();
+        String arg1 = PATTERN.apply(source).getString(), arg2 = "";
         if ("".equals(arg1))
         {
             LOG.log("command.error.missing_argument", "input");
             return;
         }
-        source.deleteCharAt(0);
-        String arg2 = PATTERN.apply(source).getString();
-        if ("".equals(arg2) && commandArg.equals("compilef"))
+        if (commandArg.equals("compilef"))
         {
-            LOG.log("command.error.missing_argument", "output");
-            return;
+            if (source.length() > 0)
+            {
+                source.deleteCharAt(0);
+            }
+            arg2 = PATTERN.apply(source).getString();
+            if ("".equals(arg2))
+            {
+                LOG.log("command.error.missing_argument", "output");
+                return;
+            }
         }
         try
         {
+            Set<CompileFlag> extraArgs = new HashSet<>();
+            while (source.length() > 0)
+            {
+                source.deleteCharAt(0);
+                String extraArg = PATTERN.apply(source).getString();
+                CompileFlag flag = CompileFlag.get(extraArg);
+                if (!"".equals(extraArg) && flag != null)
+                {
+                    extraArgs.add(flag);
+                }
+                else
+                {
+                    LOG.log("command.error.unknown_argument", extraArg);
+                }
+            }
+
             String input = Helpers.loadFile(arg1);
-            String output = AssemblyCompiler.INSTANCE.compile(input);
+            String output = AssemblyCompiler.INSTANCE.compile(input, extraArgs);
 
             if (commandArg.equals("compilef"))
             {
@@ -99,10 +124,6 @@ public final class AssemblyInterface
             {
                 LOG.log("command.message.assembly_view", output);
             }
-        }
-        catch (Error e)
-        {
-            LOG.log(e);
         }
         catch (InvalidAssemblyException e)
         {

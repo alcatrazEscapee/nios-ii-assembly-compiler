@@ -14,4 +14,9 @@ public class InvalidAssemblyException extends RuntimeException
     {
         super(AssemblyInterface.getLog().format(key, args));
     }
+
+    public InvalidAssemblyException(Throwable cause, String key, Object... args)
+    {
+        super(AssemblyInterface.getLog().format(key, args), cause);
+    }
 }

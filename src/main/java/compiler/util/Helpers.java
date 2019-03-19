@@ -88,6 +88,11 @@ public final class Helpers
         }
     }
 
+    public static boolean isValidName(String name)
+    {
+        return name.matches("^[a-zA-Z0-9_-]*$") && !"".equals(name);
+    }
+
     public static <T> String reduceCollection(Collection<T> items, Function<T, String> mappingFunction)
     {
         return items.stream().map(mappingFunction).reduce((x, y) -> x + y).orElse("");
